@@ -1,0 +1,6 @@
+require ("prototypes.equipment.equipment")
+require ("prototypes.pump.pump")
+require ("prototypes.dugwater.dugwater")
+require ("prototypes.inserter.inserter")
+require ("prototypes.warehouse.warehouse")
+--require ("prototypes.battery.battery")
