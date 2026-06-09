@@ -6,11 +6,7 @@ function dug(entity, tiles, item)
     item_name = item.name
   end
   -- 只对挖水相关的物品执行操作
-  if item_name == "landfill" then
-    for i,tile in pairs(tiles) do
-      surface.set_tiles({{name="grass-3", position=tile.position}})
-    end
-  elseif item_name == "art-dug-water" then
+  if item_name == "priyutils-dug-water" or item_name == "priyutils-dug-water-super" then
     for i,tile in pairs(tiles) do
       surface.set_tiles({{name="water", position=tile.position}})
     end

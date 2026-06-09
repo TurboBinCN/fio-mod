@@ -3,8 +3,8 @@ data:extend(
   {
     type = "technology",
     name = "priyutils-tree-farming",
-      icon = "__PriyUtils__/graphics/technology/farm_trees.png",
-    icon_size = 256,
+      icon = "__base__/graphics/icons/tree-01.png",
+    icon_size = 64,
     effects = 
     {
       {
@@ -27,8 +27,8 @@ data:extend(
   {
     type = "technology",
     name = "priyutils-forest-farming",
-      icon = "__PriyUtils__/graphics/technology/farm_trees.png",
-    icon_size = 256,
+      icon = "__base__/graphics/icons/tree-01.png",
+    icon_size = 64,
     effects = 
     {
       {

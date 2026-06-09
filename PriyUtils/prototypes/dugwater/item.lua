@@ -22,7 +22,7 @@ data:extend(
       result = "water",
       condition_size = 1,
       condition = {layers={water_tile=true}},
-      tile_condition = water_tile_condition
+      -- tile_condition = water_tile_condition
     },
     random_tint_color = item_tints.organic_green
   },
@@ -43,7 +43,7 @@ data:extend(
       result = "water",
       condition_size = 1,
       condition = {layers={water_tile=true}},
-      tile_condition = super_tile_condition
+      -- tile_condition = super_tile_condition
     },
     random_tint_color = item_tints.organic_green
   }

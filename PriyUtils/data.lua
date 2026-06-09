@@ -34,12 +34,13 @@ data:extend{
 -- TREES
 require ("prototypes.trees.trees")
 
--- CUSTOM INPUTS
-data:extend({
-  {
-    type = "custom-input",
-    name = "priyutils-switch-blueprint-snap-point",
-    key_sequence = "SHIFT + S",
-    consuming = "none"
-  }
-})
+-- BURNER TURBINE
+require("prototypes.burner-turbine.burner-turbine")
+
+-- LOADER
+require("prototypes.buildings.loader")
+require("prototypes.buildings.fast-loader")
+require("prototypes.buildings.express-loader")
+require("prototypes.buildings.advanced-loader")
+require("prototypes.buildings.superior-loader")
+require("prototypes.buildings.technology-loader")

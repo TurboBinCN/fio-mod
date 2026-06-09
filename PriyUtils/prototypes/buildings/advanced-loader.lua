@@ -1,0 +1,58 @@
+local graphics = require("prototypes.buildings.loader-graphics")
+local sounds = require("__base__.prototypes.entity.sounds")
+
+data:extend({
+  {
+    type = "recipe",
+    name = "priy-advanced-loader",
+    energy_required = 3,
+    enabled = false,
+    ingredients = {
+      { type = "item", name = "express-transport-belt", amount = 2 },
+      { type = "item", name = "priy-express-loader", amount = 1 },
+      { type = "item", name = "advanced-circuit", amount = 5 },
+    },
+    results = { { type = "item", name = "priy-advanced-loader", amount = 1 } },
+  },
+  {
+    type = "item",
+    name = "priy-advanced-loader",
+    icon = "__PriyUtils__/graphics/icons/entities/advanced-loader.png",
+    subgroup = "belt",
+    order = "d[loader]-a4[priy-advanced-loader]",
+    place_result = "priy-advanced-loader",
+    stack_size = 50,
+  },
+  {
+    type = "loader-1x1",
+    name = "priy-advanced-loader",
+    icon = "__PriyUtils__/graphics/icons/entities/advanced-loader.png",
+    flags = { "placeable-neutral", "player-creation" },
+    minable = { mining_time = 0.25, result = "priy-advanced-loader" },
+    placeable_by = { item = "priy-advanced-loader", count = 1 },
+    fast_replaceable_group = "transport-belt",
+    next_upgrade = "priy-superior-loader",
+    collision_box = { { -0.4, -0.4 }, { 0.4, 0.4 } },
+    selection_box = { { -0.5, -0.5 }, { 0.5, 0.5 } },
+    speed = 0.125,
+    container_distance = 1,
+    filter_count = 5,
+    energy_source = {
+      type = "electric",
+      usage_priority = "secondary-input",
+      drain = "1kW",
+    },
+    energy_per_item = "9kJ",
+    max_health = 300,
+    corpse = "small-remnants",
+    resistances = { { type = "fire", percent = 90 } },
+    open_sound = sounds.machine_open,
+    close_sound = sounds.machine_close,
+    belt_animation_set = data.raw["transport-belt"]["express-transport-belt"].belt_animation_set,
+    animation_speed_coefficient = 32,
+    icon_draw_specification = { scale = 0.7 },
+    structure = graphics.structure({ 76, 232, 48 }),
+    structure_render_layer = graphics.structure_render_layer,
+    circuit_wire_max_distance = default_circuit_wire_max_distance,
+  },
+})

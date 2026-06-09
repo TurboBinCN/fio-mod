@@ -32,7 +32,7 @@ data:extend(
       {type = "item", name = "coal", amount = 2} -- 使用煤作为替代
     },
     results = {{
-      type = "item", name="priyutils-tree-forest", amount=1, probability = 0.9, show_details_in_recipe_tooltip = false
+      type = "item", name="priyutils-tree-forest", amount=2, probability = 0.9, show_details_in_recipe_tooltip = false
     },{
       type = "item", name="priyutils-tree-seedling", amount=1, probability = 0.1, show_details_in_recipe_tooltip = false
     }}

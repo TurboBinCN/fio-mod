@@ -1,0 +1,57 @@
+local graphics = require("prototypes.buildings.loader-graphics")
+local sounds = require("__base__.prototypes.entity.sounds")
+
+data:extend({
+  {
+    type = "recipe",
+    name = "priy-loader",
+    energy_required = 2,
+    enabled = false,
+    ingredients = {
+      { type = "item", name = "transport-belt", amount = 1 },
+      { type = "item", name = "iron-gear-wheel", amount = 10 },
+      { type = "item", name = "iron-plate", amount = 5 },
+    },
+    results = { { type = "item", name = "priy-loader", amount = 1 } },
+  },
+  {
+    type = "item",
+    name = "priy-loader",
+    icon = "__PriyUtils__/graphics/icons/entities/loader.png",
+    subgroup = "belt",
+    order = "d[loader]-a1[priy-loader]",
+    place_result = "priy-loader",
+    stack_size = 50,
+  },
+  {
+    type = "loader-1x1",
+    name = "priy-loader",
+    icon = "__PriyUtils__/graphics/icons/entities/loader.png",
+    flags = { "placeable-neutral", "player-creation" },
+    minable = { mining_time = 0.25, result = "priy-loader" },
+    placeable_by = { item = "priy-loader", count = 1 },
+    fast_replaceable_group = "transport-belt",
+    collision_box = { { -0.4, -0.4 }, { 0.4, 0.4 } },
+    selection_box = { { -0.5, -0.5 }, { 0.5, 0.5 } },
+    speed = data.raw["transport-belt"]["transport-belt"].speed,
+    container_distance = 1,
+    filter_count = 5,
+    energy_source = {
+      type = "electric",
+      usage_priority = "secondary-input",
+      drain = "400W",
+    },
+    energy_per_item = "9kJ",
+    max_health = 300,
+    corpse = "small-remnants",
+    resistances = { { type = "fire", percent = 90 } },
+    open_sound = sounds.machine_open,
+    close_sound = sounds.machine_close,
+    belt_animation_set = data.raw["transport-belt"]["transport-belt"].belt_animation_set,
+    animation_speed_coefficient = 32,
+    icon_draw_specification = { scale = 0.7 },
+    structure = graphics.structure({ 249, 207, 70 }),
+    structure_render_layer = graphics.structure_render_layer,
+    circuit_wire_max_distance = default_circuit_wire_max_distance,
+  },
+})
