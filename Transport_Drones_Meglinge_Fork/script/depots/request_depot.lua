@@ -211,7 +211,7 @@ end
 
 local big = math.huge
 local min = math.min
-local item_heuristic_bonus = 200
+local item_heuristic_bonus = 500
 function request_depot:make_request()
   local name = self.item
   local quality = self.type == "fluid" and "" or self.quality
@@ -242,9 +242,7 @@ function request_depot:make_request()
     return distance(depot.node_position, node_position) - ((amount / request_size) * item_heuristic_bonus)
   end
 
-  local best_buffer
-  local best_index
-  local lowest_score = big
+  local scored_depots = {}
   local get_depot = self.get_depot
 
   for depot_index, count in pairs (supply_depots) do
@@ -252,24 +250,38 @@ function request_depot:make_request()
       local depot = get_depot(depot_index)
       if depot then
         local score = heuristic(depot, count)
-        if score < lowest_score then
-          best_buffer = depot
-          lowest_score = score
-          best_index = depot_index
-        end
+        table.insert(scored_depots, {
+          depot = depot,
+          index = depot_index,
+          count = count,
+          score = score
+        })
       end
     end
   end
 
-  if not best_buffer then return end
+  if #scored_depots == 0 then return end
 
-  local count = supply_depots[best_index]
-  if request_size >= count then
-    supply_depots[best_index] = nil
-    self:dispatch_drone(best_buffer, count)
-  else
-    supply_depots[best_index] = count - request_size
-    self:dispatch_drone(best_buffer, request_size)
+  table.sort(scored_depots, function(a, b) return a.score < b.score end)
+
+  local missing = (self.circuit_limit or self:get_storage_size()) - self:get_current_amount()
+  local drones_needed = math.ceil(missing / request_size)
+  local drones_available = self:get_drone_item_count() - self:get_active_drone_count()
+  local drones_to_send = math.min(drones_needed, drones_available)
+
+  local sent_count = 0
+  for _, entry in ipairs(scored_depots) do
+    if sent_count >= drones_to_send then break end
+
+    local take_amount = math.min(entry.count, request_size)
+    if take_amount >= minimum_size then
+      supply_depots[entry.index] = entry.count - take_amount
+      if supply_depots[entry.index] <= 0 then
+        supply_depots[entry.index] = nil
+      end
+      self:dispatch_drone(entry.depot, take_amount)
+      sent_count = sent_count + 1
+    end
   end
 
 end
