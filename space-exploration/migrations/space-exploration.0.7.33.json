@@ -1,0 +1,58 @@
+{
+    "recipe":
+    [
+        ["se-scrap-recycling", "se-scrap-hard-recycling"]
+    ],
+    "item":
+    [
+        ["se-delivery-cannon-package-advanced-fuel", "se-delivery-cannon-package-kr-advanced-fuel"],
+        ["se-delivery-cannon-package-ammonia-barrel", "se-delivery-cannon-package-kr-ammonia-barrel"],
+        ["se-delivery-cannon-package-bio-fuel", "se-delivery-cannon-package-kr-biofuel"],
+        ["se-delivery-cannon-package-biomethanol-barrel", "se-delivery-cannon-package-kr-biomethanol-barrel"],
+        ["se-delivery-cannon-package-chlorine-barrel", "se-delivery-cannon-package-kr-chlorine-barrel"],
+        ["se-delivery-cannon-package-coke", "se-delivery-cannon-package-kr-coke"],
+        ["se-delivery-cannon-package-dirty-water-barrel", "se-delivery-cannon-package-kr-dirty-water-barrel"],
+        ["se-delivery-cannon-package-enriched-copper", "se-delivery-cannon-package-kr-enriched-copper"],
+        ["se-delivery-cannon-package-enriched-iron", "se-delivery-cannon-package-kr-enriched-iron"],
+        ["se-delivery-cannon-package-enriched-rare-metals", "se-delivery-cannon-package-kr-enriched-rare-metals"],
+        ["se-delivery-cannon-package-fertilizer", "se-delivery-cannon-package-kr-fertilizer"],
+        ["se-delivery-cannon-package-fuel", "se-delivery-cannon-package-kr-fuel"],
+        ["se-delivery-cannon-package-glass", "se-delivery-cannon-package-kr-glass"],
+        ["se-delivery-cannon-package-heavy-water-barrel", "se-delivery-cannon-package-kr-heavy-water-barrel"],
+        ["se-delivery-cannon-package-hydrogen-barrel", "se-delivery-cannon-package-kr-hydrogen-barrel"],
+        ["se-delivery-cannon-package-hydrogen-chloride-barrel", "se-delivery-cannon-package-kr-hydrogen-chloride-barrel"],
+        ["se-delivery-cannon-package-imersite-crystal", "se-delivery-cannon-package-kr-imersite-crystal"],
+        ["se-delivery-cannon-package-imersite-powder", "se-delivery-cannon-package-kr-imersite-powder"],
+        ["se-delivery-cannon-package-imersium-plate", "se-delivery-cannon-package-kr-imersium-plate"],
+        ["se-delivery-cannon-package-lithium", "se-delivery-cannon-package-kr-lithium"],
+        ["se-delivery-cannon-package-lithium-chloride", "se-delivery-cannon-package-kr-lithium-chloride"],
+        ["se-delivery-cannon-package-mineral-water-barrel", "se-delivery-cannon-package-kr-mineral-water-barrel"],
+        ["se-delivery-cannon-package-nitric-acid-barrel", "se-delivery-cannon-package-kr-nitric-acid-barrel"],
+        ["se-delivery-cannon-package-nitrogen-barrel", "se-delivery-cannon-package-kr-nitrogen-barrel"],
+        ["se-delivery-cannon-package-oxygen-barrel", "se-delivery-cannon-package-kr-oxygen-barrel"],
+        ["se-delivery-cannon-package-quartz", "se-delivery-cannon-package-kr-quartz"],
+        ["se-delivery-cannon-package-rare-metals", "se-delivery-cannon-package-kr-rare-metals"],
+        ["se-delivery-cannon-package-raw-imersite", "se-delivery-cannon-package-kr-imersite"],
+        ["se-delivery-cannon-package-raw-rare-metals", "se-delivery-cannon-package-kr-rare-metal-ore"],
+        ["se-delivery-cannon-package-sand", "se-delivery-cannon-package-kr-sand"],
+        ["se-delivery-cannon-package-se-core-fragment-imersite", "se-delivery-cannon-package-se-core-fragment-kr-imersite"],
+        ["se-delivery-cannon-package-se-core-fragment-mineral-water", "se-delivery-cannon-package-se-core-fragment-kr-mineral-water"],
+        ["se-delivery-cannon-package-se-core-fragment-rare-metals", "se-delivery-cannon-package-se-core-fragment-kr-rare-metal-ore"],
+        ["se-delivery-cannon-package-silicon", "se-delivery-cannon-package-kr-silicon"],
+        ["se-delivery-cannon-package-tritium", "se-delivery-cannon-package-kr-tritium"],
+        ["se-delivery-cannon-artillery-targeter-antimatter-rocket", "se-delivery-cannon-artillery-targeter-kr-antimatter-rocket"],
+        ["se-delivery-cannon-weapon-package-antimatter-rocket", "se-delivery-cannon-weapon-package-kr-antimatter-rocket"],
+        ["se-core-fragment-imersite", "se-core-fragment-kr-imersite"],
+        ["se-core-fragment-mineral-water", "se-core-fragment-kr-mineral-water"],
+        ["se-core-fragment-rare-metals", "se-core-fragment-kr-rare-metal-ore"]
+    ],
+    "entity":
+    [
+        ["se-core-fragment-imersite", "se-core-fragment-kr-imersite"],
+        ["se-core-fragment-imersite-sealed", "se-core-fragment-kr-imersite-sealed"],
+        ["se-core-fragment-mineral-water", "se-core-fragment-kr-mineral-water"],
+        ["se-core-fragment-mineral-water-sealed", "se-core-fragment-kr-mineral-water-sealed"],
+        ["se-core-fragment-rare-metals", "se-core-fragment-kr-rare-metal-ore"],
+        ["se-core-fragment-rare-metals-sealed", "se-core-fragment-kr-rare-metal-ore-sealed"]
+    ]
+}

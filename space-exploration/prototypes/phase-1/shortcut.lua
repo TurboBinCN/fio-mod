@@ -1,0 +1,63 @@
+local data_util = require("data_util")
+
+data:extend({
+  {
+    type = "shortcut",
+    name = data_util.mod_prefix .. "universe-explorer",
+    associated_control_input = data_util.mod_prefix .. "universe-explorer",
+    localised_name = { "shortcut."..data_util.mod_prefix .. "universe-explorer"},
+    order = "a",
+    action = "lua",
+    style = "blue",
+    icon = "__space-exploration-graphics__/graphics/icons/astronomic/planet-orbit.png",
+    small_icon = "__space-exploration-graphics__/graphics/icons/astronomic/planet-orbit.png",
+    icon_size = 64
+  },
+  {
+    type = "shortcut",
+    name = data_util.mod_prefix .. "star-map",
+    associated_control_input = data_util.mod_prefix .. "star-map",
+    localised_name = { "shortcut."..data_util.mod_prefix .. "star-map"},
+    order = "a",
+    action = "lua",
+    style = "blue",
+    icon = "__space-exploration-graphics__/graphics/icons/starmap.png",
+    small_icon = "__space-exploration-graphics__/graphics/icons/starmap.png",
+    icon_size = 64
+  },
+  {
+    type = "shortcut",
+    name = data_util.mod_prefix .. "respawn",
+    associated_control_input = data_util.mod_prefix .. "respawn",
+    localised_name = { "shortcut."..data_util.mod_prefix .. "respawn"},
+    order = "a",
+    action = "lua",
+    style = "red",
+    icon = "__space-exploration-graphics__/graphics/icons/scull.png",
+    small_icon = "__space-exploration-graphics__/graphics/icons/scull.png",
+    icon_size = 64
+  },
+  {
+    type = "shortcut",
+    name = data_util.mod_prefix .. "toggle-lifesupport",
+    localised_name = { "shortcut.".. data_util.mod_prefix .. "toggle-lifesupport"},
+    order = "a",
+    action = "lua",
+    style = "blue",
+    icon = "__space-exploration-graphics__/graphics/icons/lifesupport-icon-transparent.png",
+    small_icon = "__space-exploration-graphics__/graphics/icons/lifesupport-icon-transparent.png",
+    icon_size = 64
+  },
+  {
+    type = "shortcut",
+    name = data_util.mod_prefix .. "blueprint-converter",
+    localised_name = { "shortcut."..data_util.mod_prefix .. "blueprint-converter"},
+    order = "a",
+    action = "lua",
+    style = "blue",
+    icon = "__space-exploration-graphics__/graphics/icons/blueprint-converter.png",
+    small_icon = "__space-exploration-graphics__/graphics/icons/blueprint-converter.png",
+    icon_size = 64,
+    toggleable = true
+  },
+})

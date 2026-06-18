@@ -1,0 +1,36 @@
+local data_util = require("data_util")
+
+data:extend(
+{
+  {
+    type = "tile",
+    name = data_util.mod_prefix.."regolith",
+    subgroup = "space-exploration-tiles",
+    collision_mask = {
+      layers = {
+        [space_collision_layer] = true,
+      },
+    }, -- nothing?
+    --autoplace = {}, -- see final-noise-programs
+    layer_group = "ground-natural",
+    layer = 206,
+    variants = tile_variations_template(
+      "__space-exploration-graphics__/graphics/terrain/asteroid/asteroid.png",
+      "__base__/graphics/terrain/masks/transition-3.png",
+      {
+        max_size = 4,
+        [1] = { weights = {0.085, 0.085, 0.085, 0.085, 0.087, 0.085, 0.065, 0.085, 0.045, 0.045, 0.045, 0.045, 0.005, 0.025, 0.045, 0.045 } },
+        [2] = { probability = 1, weights = {0.018, 0.020, 0.015, 0.025, 0.015, 0.020, 0.025, 0.015, 0.025, 0.025, 0.010, 0.025, 0.020, 0.025, 0.025, 0.010 }, },
+        [4] = { probability = 0.1, weights = {0.018, 0.020, 0.015, 0.025, 0.015, 0.020, 0.025, 0.015, 0.025, 0.025, 0.010, 0.025, 0.020, 0.025, 0.025, 0.010 }, },
+        --[8] = { probability = 1.00, weights = {0.090, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.025, 0.125, 0.005, 0.010, 0.100, 0.100, 0.010, 0.020, 0.020} },
+      }
+    ),
+    transitions = table.deepcopy(data.raw.tile["mineral-grey-dirt-1"].transitions),
+    transitions_between_transitions = table.deepcopy(data.raw.tile["mineral-grey-dirt-1"].transitions_between_transitions),
+    walking_sound = table.deepcopy(data.raw.tile["dirt-1"].walking_sound),
+    map_color = {r = 128, g = 128, b = 128},
+    ageing=0.0001,
+    walking_speed_modifier = 1,
+    vehicle_friction_modifier = 1,
+  },
+})

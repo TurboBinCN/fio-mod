@@ -1,0 +1,10 @@
+{
+    "recipe":
+    [
+        ["first-aid-kit-fish", "se-kr-first-aid-kit-fish"]
+    ],
+    "entity":
+    [
+        ["kr-matter-assembler-spaced", "kr-matter-associator-spaced"]
+    ]
+}

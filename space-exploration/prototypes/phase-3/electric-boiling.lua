@@ -1,0 +1,132 @@
+local data_util = require("data_util")
+
+local heat_capacity = data_util.string_to_number(data.raw.fluid.steam.heat_capacity)
+local boiler_power = 5000000
+local efficiency = 0.9
+
+data:extend({
+  {
+      type = "recipe",
+      name = data_util.mod_prefix .. "electric-boiling-void",
+      results = {},
+      enabled = false,
+      energy_required = (100-15) * 100 * heat_capacity / boiler_power / efficiency,
+      ingredients = {
+        { type = "fluid", name = "water", amount = 100 },
+      },
+      icons = {
+        {icon = data.raw.fluid.water.icon },
+        {icon = "__space-exploration-graphics__/graphics/icons/cross.png" },
+      },
+      icon_size = data.raw.fluid.water.icon_size,
+      subgroup = "water",
+      requester_paste_multiplier = 1,
+      always_show_made_in = false,
+      hide_from_signal_gui = false,
+      category = data_util.mod_prefix .. "electric-boiling",
+      order = "a[water]-a[water]-d[boiling-void]"
+  },
+  {
+      type = "recipe",
+      name = data_util.mod_prefix .. "electric-boiling-steam-100",
+      localised_name = {"", {"fluid-name.steam"}, " (", tostring(100), "°C)"},
+      results = {
+        { type = "fluid", name = "steam", amount = 100, temperature = 100 },
+      },
+      enabled = false,
+      energy_required = (100-15) * 100 * heat_capacity / boiler_power / efficiency,
+      ingredients = {
+        { type = "fluid", name = "water", amount = 10 },
+      },
+      main_product = "steam",
+      subgroup = "water",
+      requester_paste_multiplier = 1,
+      always_show_made_in = false,
+      hide_from_signal_gui = false,
+      category = data_util.mod_prefix .. "electric-boiling",
+      order = "a[water]-e[steam]-b[steam-100]",
+      icons = {
+        { icon = data.raw.fluid["steam"].icon, scale = 0.5, shift = {4, 0}, icon_size = 64 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/1.png", scale = 0.4, shift = {5, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {10.25, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {16, 10}, icon_size = 20 },
+      },
+  },
+  {
+      type = "recipe",
+      name = data_util.mod_prefix .. "electric-boiling-steam-165",
+      localised_name = {"", {"fluid-name.steam"}, " (", tostring(165), "°C)"},
+      results = {
+        { type = "fluid", name = "steam", amount = 100, temperature = 165 },
+      },
+      enabled = false,
+      energy_required = (165-15) * 100 * heat_capacity / boiler_power / efficiency,
+      ingredients = {
+        { type = "fluid", name = "water", amount = 10 },
+      },
+      subgroup = "water",
+      requester_paste_multiplier = 1,
+      always_show_made_in = false,
+      hide_from_signal_gui = false,
+      category = data_util.mod_prefix .. "electric-boiling",
+      order = "a[water]-e[steam]-c[steam-165]",
+      icons = {
+        { icon = data.raw.fluid["steam"].icon, scale = 0.5, shift = {4, 0}, icon_size = 64 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/1.png", scale = 0.4, shift = {5, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/6.png", scale = 0.4, shift = {10.25, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/5.png", scale = 0.4, shift = {16, 10}, icon_size = 20 },
+      },
+  },
+  {
+      type = "recipe",
+      name = data_util.mod_prefix .. "electric-boiling-steam-500",
+      localised_name = {"", {"fluid-name.steam"}, " (", tostring(500), "°C)"},
+      results = {
+        { type = "fluid", name = "steam", amount = 100, temperature = 500 },
+      },
+      enabled = false,
+      energy_required = (500-15) * 100 * heat_capacity / boiler_power / efficiency,
+      ingredients = {
+        { type = "fluid", name = "water", amount = 10 },
+      },
+      subgroup = "water",
+      requester_paste_multiplier = 1,
+      always_show_made_in = false,
+      hide_from_signal_gui = false,
+      category = data_util.mod_prefix .. "electric-boiling",
+      order = "a[water]-e[steam]-d[steam-500]",
+      icons = {
+        { icon = data.raw.fluid["steam"].icon, scale = 0.5, shift = {4, 0}, icon_size = 64 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/5.png", scale = 0.4, shift = {4.5, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {10.25, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {16, 10}, icon_size = 20 },
+      },
+  },
+  {
+      type = "recipe",
+      name = data_util.mod_prefix .. "electric-boiling-steam-5000",
+      localised_name = {"", {"fluid-name.steam"}, " (", tostring(5000), "°C)"},
+      results = {
+        { type = "fluid", name = "steam", amount = 100, temperature = 5000 },
+      },
+      enabled = false,
+      energy_required = (5000-15) * 100 * heat_capacity / boiler_power / efficiency,
+      ingredients = {
+        { type = "fluid", name = "water", amount = 10 },
+      },
+      subgroup = "water",
+      requester_paste_multiplier = 1,
+      always_show_made_in = false,
+      hide_from_signal_gui = false,
+      category = data_util.mod_prefix .. "electric-boiling",
+      order = "a[water]-e[steam]-e[steam-5000]",
+      icons = {
+        { icon = data.raw.fluid["steam"].icon, scale = 0.5, shift = {4, 0}, icon_size = 64 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/5.png", scale = 0.4, shift = {-1, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {4.5, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {10.25, 10}, icon_size = 20 },
+        { icon = "__space-exploration-graphics__/graphics/icons/number/0.png", scale = 0.4, shift = {16, 10}, icon_size = 20 },
+      },
+  }
+
+})

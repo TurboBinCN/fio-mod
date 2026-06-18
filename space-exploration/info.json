@@ -1,0 +1,105 @@
+{
+  "name": "space-exploration",
+  "version": "0.7.56",
+  "title": "Space Exploration (Experimental)",
+  "author": "Earendel",
+  "dependencies": [
+    "base >= 2.0.76",
+    "aai-containers >= 0.3.0",
+    "aai-industry >= 0.6.16",
+    "alien-biomes >= 0.7.3",
+    "jetpack >= 0.4.0",
+    "robot_attrition >= 0.6.0",
+    "shield-projector >= 0.2.0",
+    "space-exploration-graphics >= 0.7.4",
+    "space-exploration-graphics-2 >= 0.7.1",
+    "space-exploration-graphics-3 >= 0.7.2",
+    "space-exploration-graphics-4 >= 0.7.1",
+    "space-exploration-graphics-5 >= 0.7.3",
+    "space-exploration-menu-simulations >= 0.7.1",
+    "~ space-exploration-postprocess >= 0.7.5",
+    "informatron >= 0.4.0",
+    "aai-signal-transmission >= 0.5.0",
+
+    "? bullet-trails >= 0.7.0",
+    "? grappling-gun >= 0.4.0",
+    "? combat-mechanics-overhaul >= 0.7.0",
+    "? equipment-gantry >= 0.2.0",
+    "(?) Krastorio2 >= 2.0.10",
+
+    "? elevated-rails",
+    "(?) quality",
+    "! space-age",
+
+    "! angelsindustries",
+    "! angelspetrochem",
+    "! angelsrefining",
+    "! angelssmelting",
+
+    "! bobelectronics",
+    "! bobores",
+    "! bobplates",
+    "! bobpower",
+    "! bobrevamp",
+    "! bobtech",
+    "! bobvehicleequipment",
+    "! bobwarfare",
+
+    "! Yuoki",
+
+    "! pycoalprocessing",
+    "! pyindustry",
+    "! pyhightech",
+    "! PyBlock",
+
+    "! angelsinfiniteores",
+    "! BiggerStacksPlus",
+    "! BitersBegoneUpdated",
+    "! bobmodules",
+    "! Clockwork",
+    "! dangOreus",
+    "! Darkstar_utilities",
+    "! DeepMine",
+    "! Explosive Excavation",
+    "! FactorioExtended-Core",
+    "! FactorioExtended-Plus-Core",
+    "! IndustrialRevolution",
+    "! infinite-resources-depletion",
+    "! LandfillPainting",
+    "! Li-Quarry",
+    "! modmash",
+    "! MoreScience",
+    "! omnimatter",
+    "! quality-se",
+    "! quarry-edit",
+    "! rso-mod",
+    "! SeaBlock",
+    "! SchallMachineScaling",
+    "! SchallOreConversion",
+    "! sonaxaton-infinite-resources",
+    "! Space-Exploration-Modpack",
+    "! SpaceMod",
+    "! TeamCoop",
+    "! traintunnels",
+    "! Unlimited-Resources",
+    "! UnlimitedProductivity",
+    "! vtk-deep-core-mining"
+  ],
+  "description": "Build Cargo Rockets to launch stuff into space. Ride a rocket into space yourself and start spacewalking. Build an orbital space platform to develop difficult data-driven space science. Build a spaceship tile by tile, fly it from a planet surface to other planets, moons, asteroid fields. Build interstellar death rays and deep space mining colonies. Explore ancient ruins on alien planets and relics lost in deep space.  Not recommended to play with non-dependency mods while in experimental phase.",
+  "factorio_version": "2.0",
+  "homepage": "https://spaceexploration.miraheze.org/wiki/Main_Page",
+  "package": {
+    "git_publish_branch": "master",
+    "ignore": ["**"],
+    "extra": [
+      {
+        "root": ".build"
+      }
+    ],
+    "scripts": {
+      "datestamp": "sh ./build-scripts/datestamp.sh",
+      "prepackage": "sh ./build-scripts/prepackage.sh",
+      "postpublish": "sh ./build-scripts/postpublish.sh"
+    }
+  }
+}

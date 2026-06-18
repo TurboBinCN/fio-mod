@@ -1,0 +1,104 @@
+{
+    "technology":
+    [
+        ["effectivity-module-4", "efficiency-module-4"],
+        ["effectivity-module-5", "efficiency-module-5"],
+        ["effectivity-module-6", "efficiency-module-6"],
+        ["effectivity-module-7", "efficiency-module-7"],
+        ["effectivity-module-8", "efficiency-module-8"],
+        ["effectivity-module-9", "efficiency-module-9"],
+        ["se-rtg-equipment-2", "fission-reactor-equipment"]
+    ],
+
+    "recipe":
+    [
+        ["effectivity-module-4", "efficiency-module-4"],
+        ["effectivity-module-5", "efficiency-module-5"],
+        ["effectivity-module-6", "efficiency-module-6"],
+        ["effectivity-module-7", "efficiency-module-7"],
+        ["effectivity-module-8", "efficiency-module-8"],
+        ["effectivity-module-9", "efficiency-module-9"],
+        ["se-naquium-heat-pipe-long--+--", "se-naquium-heat-pipe-long--t--"],
+        ["se-naquium-heat-pipe-long--+-----+--", "se-naquium-heat-pipe-long--t-----t--"],
+        ["se-empty-barrel-reprocessing", "se-barrel-reprocessing"],
+        ["fill-se-beryllium-hydroxide-barrel", "se-beryllium-hydroxide-barrel"],
+        ["fill-se-contaminated-space-water-barrel", "se-contaminated-space-water-barrel"],
+        ["fill-se-space-water-barrel", "se-space-water-barrel"],
+        ["fill-se-methane-gas-barrel", "se-methane-gas-barrel"],
+        ["fill-se-pyroflux-barrel", "se-pyroflux-barrel"],
+        ["fill-se-cryonite-slush-barrel", "se-cryonite-slush-barrel"],
+        ["fill-se-vitalic-acid-barrel", "se-vitalic-acid-barrel"],
+        ["fill-se-liquid-rocket-fuel-barrel", "se-liquid-rocket-fuel-barrel"],
+        ["fill-se-bio-sludge-barrel", "se-bio-sludge-barrel"],
+        ["fill-se-contaminated-bio-sludge-barrel", "se-contaminated-bio-sludge-barrel"],
+        ["fill-se-chemical-gel-barrel", "se-chemical-gel-barrel"],
+        ["fill-se-nutrient-gel-barrel", "se-nutrient-gel-barrel"],
+        ["fill-se-neural-gel-barrel", "se-neural-gel-barrel"],
+        ["fill-se-neural-gel-2-barrel", "se-neural-gel-2-barrel"],
+        ["fill-se-space-coolant-hot-barrel", "se-space-coolant-hot-barrel"],
+        ["se-rocket-landing-pad", "cargo-landing-pad"],
+        ["se-deep-space-transport-belt", "se-deep-space-transport-belt-black"],
+        ["se-deep-space-splitter", "se-deep-space-splitter-black"],
+        ["se-deep-space-underground-belt", "se-deep-space-underground-belt-black"],
+        ["se-core-miner", "se-core-miner-drill"],
+        ["se-rtg-equipment-2", "fission-reactor-equipment"],
+        ["se-beryllium-ingot-to-plate","se-beryllium-plate"],
+        ["se-holmium-ingot-to-plate","se-holmium-plate"],
+        ["se-iridium-ingot-to-plate","se-iridium-plate"],
+        ["se-naquium-ingot-to-plate","se-naquium-plate"],
+        ["sand-from-stone","sand"],
+        ["glass-from-sand","glass"],
+        ["se-space-coolant","se-space-coolant-hot"],
+        ["se-space-coolant-cryonite","se-space-coolant-hot-cryonite"],
+        ["se-melting-methane-ice","se-methane-gas"],
+        ["se-cryonite-to-methane-ice","se-methane-ice"],
+        ["se-cryonite-to-water-ice","se-water-ice"],
+        ["se-cargo-rocket-section-pack","se-cargo-rocket-section-packed"],
+        ["se-lifesupport-canister-coal","se-lifesupport-canister"],
+        ["se-radiating-space-coolant-normal","se-space-coolant-warm"],
+        ["se-astrometric-analysis-multispectral-1","se-astrometric-data"]
+    ],
+
+    "item":
+    [
+        ["effectivity-module-4", "efficiency-module-4"],
+        ["effectivity-module-5", "efficiency-module-5"],
+        ["effectivity-module-6", "efficiency-module-6"],
+        ["effectivity-module-7", "efficiency-module-7"],
+        ["effectivity-module-8", "efficiency-module-8"],
+        ["effectivity-module-9", "efficiency-module-9"],
+        ["se-naquium-heat-pipe-long--+--", "se-naquium-heat-pipe-long--t--"],
+        ["se-naquium-heat-pipe-long--+-----+--", "se-naquium-heat-pipe-long--t-----t--"],
+        ["se-rocket-landing-pad", "cargo-landing-pad"],
+        ["se-core-miner", "se-core-miner-drill"],
+        ["se-rtg-equipment-2", "fission-reactor-equipment"]
+    ],
+
+    "equipment":
+    [
+        ["se-rtg-equipment-2", "fission-reactor-equipment"]
+    ],
+
+    "entity":
+    [
+        ["se-space-straight-rail", "se-space-legacy-straight-rail"],
+        ["se-space-curved-rail", "se-space-legacy-curved-rail"],
+        ["se-space-elevator-straight-rail", "se-space-elevator-legacy-straight-rail"],
+        ["se-space-elevator-curved-rail", "se-space-elevator-legacy-curved-rail"],
+        ["se-naquium-heat-pipe-long--+--", "se-naquium-heat-pipe-long--t--"],
+        ["se-naquium-heat-pipe-long--+-----+--", "se-naquium-heat-pipe-long--t-----t--"],
+        ["ruin-stack-inserter-remnants", "ruin-bulk-inserter-remnants"],
+        ["ruin-filter-inserter-remnants", "ruin-fast-inserter-remnants"],
+        ["ruin-stack-filter-inserter-remnants", "ruin-bulk-inserter-remnants"],
+        ["rock-medium-beige", "medium-rock-beige"],
+        ["rock-big-beige", "big-rock-beige"],
+        ["rock-huge-beige", "huge-rock-beige"],
+        ["se-rock-medium-asteroid", "se-medium-rock-asteroid"],
+        ["se-rock-big-asteroid", "se-big-rock-asteroid"],
+        ["se-rock-huge-asteroid", "se-huge-rock-asteroid"],
+        ["se-sand-rock-big-asteroid", "se-sand-big-rock-asteroid"],
+        ["se-sand-rock-huge-asteroid", "se-sand-huge-rock-asteroid"],
+        ["puberty-decal-ruin", "cracked-mud-decal-ruin"],
+        ["se-rocket-landing-pad", "cargo-landing-pad"]
+    ]
+}

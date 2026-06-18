@@ -1,0 +1,16 @@
+local data_util = require("data_util")
+
+-- Smelt-Crafting category doesn't particularly fit the theme of SE yet.
+data_util.delete_recipe("kr-copper-cable-from-copper-ore")
+data_util.delete_recipe("kr-copper-cable-from-enriched-copper")
+data_util.delete_recipe("kr-iron-stick-from-iron-ore")
+data_util.delete_recipe("kr-iron-stick-from-enriched-iron")
+data_util.delete_recipe("kr-iron-beam-from-iron-ore")
+data_util.delete_recipe("kr-iron-beam-from-enriched-iron")
+data_util.delete_recipe("kr-easy-steel-beam")
+data_util.delete_recipe("kr-easy-imersium-beam")
+data_util.delete_recipe("kr-iron-gear-wheel-from-iron-ore")
+data_util.delete_recipe("kr-iron-gear-wheel-from-enriched-iron")
+data_util.delete_recipe("kr-easy-steel-gear-wheel")
+data_util.delete_recipe("kr-easy-imersium-gear-wheel")
+data_util.delete_recipe("kr-easy-electronic-components")
