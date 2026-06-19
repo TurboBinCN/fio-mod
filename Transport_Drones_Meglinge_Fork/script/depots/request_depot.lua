@@ -342,13 +342,13 @@ function request_depot:set_request_mode()
 
   local product_type = recipe.products[1].type
   if product_type == "item" then
-    self:say("Set to item")
+    self:say({"set-to-item"})
     self.mode = request_mode.item
     return
   end
 
   if product_type == "fluid" then
-    self:say("Set to fluid")
+    self:say({"set-to-fluid"})
     self.mode = request_mode.fluid
     return
   end
@@ -530,14 +530,14 @@ function request_depot:update_circuit_writer()
   local behavior = self.circuit_writer.get_control_behavior()
   if not behavior then
     self.circuit_limit = 0
-    self:say("Depot disabled")
+    self:say({"depot-disabled"})
     return
   end
 
   local circuit_condition = behavior.connect_to_logistic_network and behavior.logistic_condition or behavior.circuit_condition
   if circuit_condition then
     local condition = circuit_condition
-    if condition.comparator == "=" then
+    if condition.comparator == "=" or condition.comparator == "<=" or condition.comparator == "<" then
       local first_signal = condition.first_signal
       if first_signal then
         if first_signal.name == self.item then
@@ -549,7 +549,7 @@ function request_depot:update_circuit_writer()
           end
           if self.circuit_limit ~= count then
             self.circuit_limit = count
-            self:say("Set limit "..count)
+            self:say({"set-limit", count/1000})
           end
           return
         end
@@ -557,14 +557,14 @@ function request_depot:update_circuit_writer()
     end
     if circuit_condition.fulfilled then
       self.circuit_limit = nil
-      self:say("Depot enabled")
+      self:say({"depot-enabled"})
       return
     end
   end
 
   --If there is a writer with no conditions, we just disable the depot.
   self.circuit_limit = 0
-  self:say("Depot disabled")
+  self:say({"depot-disabled"})
 
 end
 

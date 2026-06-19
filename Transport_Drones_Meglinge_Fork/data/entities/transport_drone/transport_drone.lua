@@ -430,6 +430,26 @@ local slow_sticker =
   target_movement_modifier_to = 1
 }
 
+local speed_sticker =
+{
+  type = "sticker",
+  name = "drone-speedup-sticker",
+  flags = {},
+  animation =
+  {
+    filename = "__base__/graphics/entity/slowdown-sticker/slowdown-sticker.png",
+    priority = "extra-high",
+    width = 1,
+    height = 1,
+    frame_count = 1,
+    animation_speed = 1
+  },
+  duration_in_ticks = 1 * 60,
+  target_movement_modifier = 1.25,
+  target_movement_modifier_from = 1,
+  target_movement_modifier_to = 1.25
+}
+
 
 local get_item = function(entity)
   if entity.minable.result then
@@ -760,7 +780,8 @@ end
 
 data:extend
 {
-  slow_sticker
+  slow_sticker,
+  speed_sticker
 }
 
 local sprite_switch_hack_proxy =

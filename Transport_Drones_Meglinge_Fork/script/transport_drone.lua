@@ -838,6 +838,25 @@ local on_tick = function(event)
   end
 end
 
+local check_road_speed = function(event)
+  for unit_number, drone in pairs(script_data.drones) do
+    if drone.entity and drone.entity.valid then
+      local surface = drone.entity.surface
+      local position = drone.entity.position
+      local tile = surface.get_tile(position)
+      if tile and tile.name == "transport-drone-road-better" then
+        surface.create_entity{name = "drone-speedup-sticker", position = position, target = drone.entity, force = "neutral"}
+      end
+    end
+  end
+end
+
+local road_speed_on_tick = function(event)
+  if event.tick % 30 == 0 then
+    check_road_speed(event)
+  end
+end
+
 local set_map_settings = function()
   game.map_settings.path_finder.max_steps_worked_per_tick = 10000
   game.map_settings.path_finder.max_work_done_per_tick = 80000
@@ -860,7 +879,10 @@ transport_drone.events =
   [defines.events.on_ai_command_completed] = on_ai_command_completed,
 
   ["follow-drone"] = follow_drone_hotkey,
-  [defines.events.on_tick] = on_tick,
+  [defines.events.on_tick] = function(event)
+    on_tick(event)
+    road_speed_on_tick(event)
+  end,
 }
 
 transport_drone.on_load = function()

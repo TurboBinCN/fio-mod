@@ -57,9 +57,18 @@ local get_neighbors = function(surface, x, y)
   local neighbors = {}
 
   for k, offset in pairs (neighbor_offsets) do
-    local node = get_node(surface, x + offset[1], y + offset[2])
+    local nx, ny = x + offset[1], y + offset[2]
+    local node = get_node(surface, nx, ny)
     if node then
-      neighbors[k] = node
+      if offset[1] ~= 0 and offset[2] ~= 0 then
+        local horizontal_node = get_node(surface, x + offset[1], y)
+        local vertical_node = get_node(surface, x, y + offset[2])
+        if horizontal_node and vertical_node then
+          neighbors[k] = node
+        end
+      else
+        neighbors[k] = node
+      end
     end
   end
 
@@ -536,24 +545,7 @@ end
 local floor = math.floor
 
 local get_tiles = function()
-  local mask = prototypes.tile["transport-drone-road"].collision_mask
-  local tiles = {}
-  for name, tile in pairs (prototypes.tile) do
-    local tile_mask = tile.collision_mask or {}
-    if table_size(tile_mask) == table_size(mask) then
-      local good = true
-      for layer, bool in pairs (mask.layers) do
-        if not tile_mask.layers[layer] then
-          good = false
-          break
-        end
-      end
-      if good then
-        table.insert(tiles, name)
-      end
-    end
-  end
-  return tiles
+  return {"transport-drone-road", "transport-drone-road-better"}
 end
 
 local reset = function()

@@ -404,13 +404,13 @@ function buffer_depot:set_request_mode()
 
   local product_type = recipe.products[1].type
   if product_type == "item" then
-    self:say("Set to item")
+    self:say({"set-to-item"})
     self.mode = request_mode.item
     return
   end
 
   if product_type == "fluid" then
-    self:say("Set to fluid")
+    self:say({"set-to-fluid"})
     self.mode = request_mode.fluid
     return
   end
@@ -729,7 +729,7 @@ function buffer_depot:update_circuit_writer()
   if not behavior then
     if self.circuit_limit ~= 0 then
       self.circuit_limit = 0
-      self:say("Depot disabled")
+      self:say({"depot-disabled"})
       message_panel:log_and_print("[Buffer Depot] Circuit writer disabled - no behavior")
     end
     return
@@ -738,7 +738,7 @@ function buffer_depot:update_circuit_writer()
   local circuit_condition = behavior.connect_to_logistic_network and behavior.logistic_condition or behavior.circuit_condition
   if circuit_condition then
     local condition = circuit_condition
-    if condition.comparator == "=" then
+    if condition.comparator == "=" or condition.comparator == "<=" or condition.comparator == "<" then
       local first_signal = condition.first_signal
       if first_signal then
         if first_signal.name == self.item then
@@ -750,7 +750,7 @@ function buffer_depot:update_circuit_writer()
           end
           if self.circuit_limit ~= count then
             self.circuit_limit = count
-            self:say("Set limit "..count)
+            self:say({"set-limit-no-k", count})
             message_panel:log_and_print("[Buffer Depot] Circuit limit changed to: " .. count .. " (item: " .. (self.item or "nil") .. ")")
           end
           return
@@ -760,7 +760,7 @@ function buffer_depot:update_circuit_writer()
     if circuit_condition.fulfilled then
       if self.circuit_limit ~= nil then
         self.circuit_limit = nil
-        self:say("Depot enabled")
+        self:say({"depot-enabled"})
         message_panel:log_and_print("[Buffer Depot] Circuit condition fulfilled - depot enabled")
       end
       return
@@ -770,7 +770,7 @@ function buffer_depot:update_circuit_writer()
   --If there is a writer with no conditions, we just disable the depot.
   if self.circuit_limit ~= 0 then
     self.circuit_limit = 0
-    self:say("Depot disabled")
+    self:say({"depot-disabled"})
     message_panel:log_and_print("[Buffer Depot] No circuit conditions met - depot disabled")
   end
 
