@@ -1,5 +1,9 @@
 local road_network = require("script/road_network")
 local depot_common = require("script/depot_common")
+local mod_gui = require("mod-gui")
+
+local name_button_overhead = "transport-drones-overhead"
+local name_setting_overhead = "transport-drones-show-overhead-button"
 
 local network_size = function(network)
 
@@ -820,12 +824,50 @@ local split = function(str)
   return fields
 end
 
+local toggle_gui = function(event)
+  local player = game.get_player(event.player_index)
+  if not (player and player.valid) then return end
+
+  local frame = get_frame(player)
+  if frame then
+    frame.destroy()
+    return
+  end
+
+  local nearby_network_index
+
+  local nearby_road_tile = player.surface.find_tiles_filtered{name = "transport-drone-road", limit = 1, position = player.position, radius = 32}[1]
+
+  if nearby_road_tile then
+      local node = road_network.get_node(player.surface.index, nearby_road_tile.position.x, nearby_road_tile.position.y)
+      if node then
+        local network_id = node.id
+        local count = 1
+        for id, network in pairs (road_network.get_networks()) do
+          if id == network_id then
+            nearby_network_index = count
+            break
+          end
+          count = count + 1
+        end
+      end
+  end
+
+  open_gui(player, nearby_network_index)
+
+end
+
 local on_gui_click = function(event)
   local gui = event.element
   if not (gui and gui.valid) then return end
 
   local player = game.get_player(event.player_index)
   if not (player and player.valid) then return end
+
+  if gui.name == name_button_overhead then
+    toggle_gui(event)
+    return
+  end
 
   if not get_frame(player) then return end
   if gui.get_mod() ~= "Transport_Drones" then return end
@@ -907,42 +949,30 @@ local on_gui_closed = function(event)
   end
 end
 
-local toggle_gui = function(event)
-  local player = game.get_player(event.player_index)
-  if not (player and player.valid) then return end
-
-  local frame = get_frame(player)
-  if frame then
-    frame.destroy()
-    return
-  end
-
-  local nearby_network_index
-
-  local nearby_road_tile = player.surface.find_tiles_filtered{name = "transport-drone-road", limit = 1, position = player.position, radius = 32}[1]
-
-  if nearby_road_tile then
-      local node = road_network.get_node(player.surface.index, nearby_road_tile.position.x, nearby_road_tile.position.y)
-      if node then
-        local network_id = node.id
-        local count = 1
-        for id, network in pairs (road_network.get_networks()) do
-          if id == network_id then
-            nearby_network_index = count
-            break
-          end
-          count = count + 1
-        end
-      end
-  end
-
-  open_gui(player, nearby_network_index)
-
-end
-
 local on_lua_shortcut = function(event)
   if event.prototype_name ~= "transport-drones-gui" then return end
   toggle_gui(event)
+end
+
+local update_overhead_button = function(player_index)
+  local player = game.get_player(player_index)
+  if not player then return end
+  local button_flow = mod_gui.get_button_flow(player)
+  if not button_flow then return end
+
+  local button = button_flow[name_button_overhead]
+
+  if player.mod_settings[name_setting_overhead].value == true then
+    button = button or button_flow.add{
+      type = "sprite-button",
+      name = name_button_overhead,
+      sprite = "item/transport-drone",
+      tooltip = {"shortcut.transport-drones-gui"}
+    }
+    button.enabled = true
+  elseif button then
+    button.destroy()
+  end
 end
 
 commands.add_command("toggle-transport-depot-gui", "idk",
@@ -954,6 +984,18 @@ end)
 
 local lib = {}
 
+lib.update_overhead_button = update_overhead_button
+
+local on_runtime_mod_setting_changed = function(event)
+  if event.player_index and event.setting == name_setting_overhead then
+    update_overhead_button(event.player_index)
+  end
+end
+
+local on_player_joined_game = function(event)
+  update_overhead_button(event.player_index)
+end
+
 lib.events =
 {
   [defines.events.on_tick] = on_tick,
@@ -963,7 +1005,9 @@ lib.events =
   [defines.events.on_gui_elem_changed] = on_gui_elem_changed,
   [defines.events.on_gui_closed] = on_gui_closed,
   ["toggle-road-network-gui"] = toggle_gui,
-  [defines.events.on_lua_shortcut] = on_lua_shortcut
+  [defines.events.on_lua_shortcut] = on_lua_shortcut,
+  [defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
+  [defines.events.on_player_joined_game] = on_player_joined_game
 }
 
 return lib

@@ -5,7 +5,7 @@ local writer_sprite = util.copy(data.raw["constant-combinator"]["constant-combin
 
 local writer = util.copy(data.raw.pump.pump)
 writer.name = "transport-depot-writer"
-writer.localised_name = "Transport depot writer"
+writer.localised_name = {"transport-depot-writer"}
 writer.energy_source =
 {
   type = "void",
@@ -91,7 +91,7 @@ data:extend
 
 local reader = util.copy(data.raw["constant-combinator"]["constant-combinator"])
 reader.name = "transport-depot-reader"
-reader.localised_name = "Transport depot reader"
+reader.localised_name = {"transport-depot-reader"}
 reader.item_slot_count = 2
 reader.sprites = require(util.path("data/entities/transport_depot_circuits/depot-reader-sprite"))
 reader.icon = util.path("data/entities/transport_depot_circuits/depot-reader-icon.png")

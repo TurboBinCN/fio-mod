@@ -3,11 +3,18 @@ local settings =
   {
     type = "int-setting",
     name = "transport-depot-update-interval",
-    localised_name = "Transport depot update interval",
+    localised_name = {"mod-setting-name.transport-depot-update-interval"},
     setting_type = "runtime-global",
     default_value = 60,
     minimum_value = 1,
     maximum_value = 80085
+  },
+  {
+    type = "bool-setting",
+    name = "transport-drones-show-overhead-button",
+    localised_name = {"mod-setting-name.transport-drones-show-overhead-button"},
+    setting_type = "runtime-per-user",
+    default_value = true
   },
 
   {

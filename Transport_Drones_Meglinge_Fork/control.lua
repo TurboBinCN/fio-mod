@@ -4,11 +4,24 @@ util = require("script/script_util")
 
 local handler = require("event_handler")
 
+local gui = require("script/gui")
+handler.add_lib(gui)
 handler.add_lib(require("script/road_network"))
 handler.add_lib(require("script/depot_common"))
 handler.add_lib(require("script/transport_drone"))
 handler.add_lib(require("script/proxy_tile"))
 handler.add_lib(require("script/transport_technologies"))
-handler.add_lib(require("script/gui"))
 
 --require("script/remote_interface")
+
+script.on_init(function()
+  for _, player in pairs(game.connected_players) do
+    gui.update_overhead_button(player.index)
+  end
+end)
+
+script.on_configuration_changed(function()
+  for _, player in pairs(game.connected_players) do
+    gui.update_overhead_button(player.index)
+  end
+end)

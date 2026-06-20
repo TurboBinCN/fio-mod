@@ -197,7 +197,7 @@ local circuit_writer_built = function(entity)
 
       if not (this_depot.circuit_writer and this_depot.circuit_writer.valid) then
         this_depot.circuit_writer = entity
-        this_depot:say("Circuit writer attached")
+        this_depot:say({"circuit-writer-attached"})
         return
       end
     end
@@ -220,7 +220,7 @@ local circuit_reader_built = function(entity)
     if this_depot then
       if not (this_depot.circuit_reader and this_depot.circuit_reader.valid) then
         this_depot.circuit_reader = entity
-        this_depot:say("Circuit reader attached")
+        this_depot:say({"circuit-reader-attached"})
         attached = true
         break
       end
