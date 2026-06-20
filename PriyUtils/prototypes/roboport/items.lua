@@ -1,0 +1,26 @@
+﻿data:extend({
+    {
+        type = "item",
+        name = "kr-large-roboport",
+        icon = "__PriyUtils__/graphics/icons/large-roboport.png",
+        icon_size = 64,
+        icon_mipmaps = 4,
+        subgroup = "logistic-network",
+        order = "c[signal]-c[large-roboport]",
+        place_result = "kr-large-roboport",
+        stack_size = 10,
+        weight = 200000,
+    },
+    {
+        type = "item",
+        name = "kr-small-roboport",
+        icon = "__PriyUtils__/graphics/icons/small-roboport.png",
+        icon_size = 64,
+        icon_mipmaps = 4,
+        subgroup = "logistic-network",
+        order = "c[signal]-b[small-roboport]",
+        place_result = "kr-small-roboport",
+        stack_size = 10,
+        weight = 50000,
+    },
+})

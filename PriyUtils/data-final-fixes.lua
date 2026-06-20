@@ -25,3 +25,11 @@ if data.raw.item["wood"] then
   -- 同时修改默认请求数量
   data.raw.item["wood"].default_request_amount = 24000
 end
+-- 修改 laser-turret 的攻速与伤害
+if data.raw["electric-turret"]["laser-turret"] then
+  local laser_turret = data.raw["electric-turret"]["laser-turret"]
+  -- 攻速: 从 40 tick 改为 20 tick（攻速翻倍）
+  laser_turret.attack_parameters.cooldown = 20
+  -- 伤害倍率: 从 2 改为 4（伤害翻倍）
+  laser_turret.attack_parameters.damage_modifier = 4
+end

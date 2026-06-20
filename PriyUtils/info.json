@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "title": "PriyUtils",
     "author": "Priy",
-    "description": "常用mod集合，包括装备小型化、水泵速度调高、挖井和机械爪能力速度功能",
+    "description": "常用mod集合，包括装备小型化、水泵速度调高、挖井、机械爪能力速度功能、高级/超级传送带和分流器",
     "factorio_version": "2.0",
     "dependencies": [
         "base >= 2.0",
