@@ -416,12 +416,12 @@ end
 function transport_drone:update_sticker()
 
 
-  if self.background_rendering then
+  if self.background_rendering and self.background_rendering.valid then
     self.background_rendering.destroy()
     self.background_rendering = nil
   end
 
-  if self.item_rendering then
+  if self.item_rendering and self.item_rendering.valid then
     self.item_rendering.destroy()
     self.item_rendering = nil
   end

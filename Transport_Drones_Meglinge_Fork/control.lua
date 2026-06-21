@@ -15,13 +15,20 @@ handler.add_lib(require("script/transport_technologies"))
 --require("script/remote_interface")
 
 script.on_init(function()
+  rendering.clear("Transport_Drones_Meglinge_Fork")
   for _, player in pairs(game.connected_players) do
     gui.update_overhead_button(player.index)
   end
 end)
 
 script.on_configuration_changed(function()
+  rendering.clear("Transport_Drones_Meglinge_Fork")
   for _, player in pairs(game.connected_players) do
     gui.update_overhead_button(player.index)
   end
+end)
+
+script.on_nth_tick(1, function()
+  rendering.clear("Transport_Drones_Meglinge_Fork")
+  script.on_nth_tick(1, nil)
 end)

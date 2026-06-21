@@ -385,6 +385,8 @@ road_network.add_node = function(surface, x, y)
     id = new_node_id
   }
 
+  road_network.trigger_network_changed()
+
 end
 
 road_network.remove_node = function(surface, x, y)
@@ -447,6 +449,8 @@ road_network.remove_node = function(surface, x, y)
     end
 
   end
+
+  road_network.trigger_network_changed()
 
 end
 
@@ -638,10 +642,19 @@ road_network.on_configuration_changed = function()
 
 end
 
+road_network.trigger_network_changed = function()
+  if remote.interfaces["Transport_Drones_Meglinge_Fork"] and remote.interfaces["Transport_Drones_Meglinge_Fork"]["increment_network_version"] then
+    remote.call("Transport_Drones_Meglinge_Fork", "increment_network_version")
+  end
+end
+
 road_network.get_network_by_id = get_network_by_id
 road_network.get_node = get_node
 road_network.get_networks = function()
   return script_data.networks
+end
+road_network.get_node_map = function()
+  return script_data.node_map
 end
 
 return road_network

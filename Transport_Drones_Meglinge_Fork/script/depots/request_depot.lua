@@ -222,7 +222,6 @@ function request_depot:make_request()
   if not self:should_order() then return end
   local supply_depots = self.road_network.get_supply_depots(self.network_id, name ,quality)
 
-  message_panel:log_and_print("supply_depots: "..serpent.block(supply_depots))
   if not supply_depots then return end
   local request_size = self:get_request_size()
   local minimum_size = self:get_minimum_request_size()
@@ -633,15 +632,14 @@ end
 function request_depot:update_sticker()
 
   if not self.item then
-    -- if self.rendering and rendering.is_valid(self.rendering) then
-    if self.rendering~= nil then
+    if self.rendering ~= nil then
       self.rendering.destroy()
       self.rendering = nil
     end
     return
   end
 
-  if self.rendering ~= nil then
+  if self.rendering ~= nil and self.rendering.valid then
     self.rendering.text = self:get_active_drone_count().."/"..self:get_drone_item_count()
     return
   end

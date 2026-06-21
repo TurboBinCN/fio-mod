@@ -1,4 +1,4 @@
-local DEBUG_MODE = false -- 设置为 true 开启日志，false 关闭日志
+local DEBUG_MODE = true -- 设置为 true 开启日志，false 关闭日志
 local message_panel = {}
 function message_panel:log_and_print(msg)
     if DEBUG_MODE then

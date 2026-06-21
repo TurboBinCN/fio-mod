@@ -15,6 +15,13 @@ local hotkeys =
     key_sequence = "CONTROL + T",
     enabled_while_in_cutscene = true
   },
+  {
+    type = "custom-input",
+    name = "toggle-transport-network-overlay",
+    localised_name = {"controls.toggle-transport-network-overlay"},
+    key_sequence = "CONTROL + SHIFT + T",
+    enabled_while_in_cutscene = true
+  },
 }
 
 data:extend(hotkeys)
