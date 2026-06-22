@@ -87,6 +87,77 @@ local get_network_by_dropdown_index = function(selected_index)
   return network
 end
 
+local get_network_by_id = function(network_id)
+  local networks = road_network.get_networks()
+  return networks[network_id]
+end
+
+local get_network_surface_name = function(network, network_id)
+  local surface_name = ""
+  for category, depots in pairs(network.depots) do
+    for _, depot in pairs(depots) do
+      if depot.entity and depot.entity.valid then
+        surface_name = depot.entity.surface.name
+        break
+      end
+    end
+    if surface_name ~= "" then break end
+  end
+  
+  if surface_name == "" then
+    local node_map = road_network.get_node_map()
+    for surface_index, surface_map in pairs(node_map) do
+      local surface_obj = game.surfaces[surface_index]
+      for x, x_map in pairs(surface_map) do
+        for y, node in pairs(x_map) do
+          if node.id == network_id then
+            surface_name = surface_obj.name
+            break
+          end
+        end
+        if surface_name ~= "" then break end
+      end
+      if surface_name ~= "" then break end
+    end
+  end
+  return surface_name
+end
+
+local create_depot_row = function(parent, depot)
+  local depot_frame = parent[depot.index]
+  if not depot_frame then
+    depot_frame = parent.add{type = "flow", name = depot.index, direction = "horizontal"}
+    depot_frame.style.horizontally_stretchable = true
+    depot_frame.style.vertical_align = "center"
+    
+    local map_button = depot_frame.add{
+      type = "sprite-button",
+      name = "open_depot_map_" .. depot.index,
+      sprite = "utility/custom_tag_in_map_view"
+    }
+    map_button.style.width = 32
+    map_button.style.height = 32
+  end
+  return depot_frame
+end
+
+local update_depot_tab = function(depots, gui, filter, update_func)
+  if not depots then return end
+
+  for index, depot in pairs(depots) do
+    if depot.entity.valid then
+      local depot_frame = create_depot_row(gui, depot)
+      update_func(depot, depot_frame, filter)
+    end
+  end
+
+  for k, gui_element in pairs(gui.children) do
+    if not depots[gui_element.name] then
+      gui_element.destroy()
+    end
+  end
+end
+
 local get_frame = function(player)
   local gui = player.gui.screen
   return gui.road_network_frame
@@ -96,27 +167,16 @@ local get_selected_network = function(player)
   local frame = get_frame(player)
   if not frame then return end
   
-  if frame.title_flow and frame.title_flow.road_network_drop_down then
-    local index = frame.title_flow.road_network_drop_down.selected_index
-    player_selected_networks[player.index] = index
-    return get_network_by_dropdown_index(index)
-  end
-  
-  local selected_index = player_selected_networks[player.index]
-  if selected_index then
-    local network = get_network_by_dropdown_index(selected_index)
+  local selected_id = player_selected_networks[player.index]
+  if selected_id then
+    local network = get_network_by_id(selected_id)
     if network then return network end
   end
   
   local networks = road_network.get_networks()
-  local count = 0
   for k, network in pairs(networks) do
-    count = count + 1
-    if count == 1 then
-      player_selected_networks[player.index] = 1
-
-      return network
-    end
+    player_selected_networks[player.index] = k
+    return network
   end
   
   return nil
@@ -424,35 +484,7 @@ local update_supply_depot_gui = function(depot, gui, filter)
 end
 
 local update_supply_tab = function(depots, gui, filter)
-
-  if not depots then return end
-
-  for index, depot in pairs (depots) do
-    if depot.entity.valid then
-      local depot_frame = gui[index]
-      if not depot_frame then
-        depot_frame = gui.add{type = "flow", name = index, direction = "horizontal"}
-        depot_frame.style.horizontally_stretchable = true
-        depot_frame.style.vertical_align = "center"
-        
-        local map_button = depot_frame.add{
-          type = "sprite-button", 
-          name = "open_depot_map_"..depot.index,
-          sprite = "utility/custom_tag_in_map_view"
-        }
-        map_button.style.width = 32
-        map_button.style.height = 32
-      end
-      update_supply_depot_gui(depot, depot_frame, filter)
-    end
-  end
-
-  for k, gui in pairs (gui.children) do
-    if not depots[gui.name] then
-      gui.destroy()
-    end
-  end
-
+  update_depot_tab(depots, gui, filter, update_supply_depot_gui)
 end
 
 local refresh_supply_tab = function(player, force)
@@ -568,34 +600,7 @@ end
 
 local fuel_map_size = 64 * 3
 local update_fuel_tab = function(depots, gui, filter)
-
-  if not depots then return end
-
-  for index, depot in pairs (depots) do
-    if depot.entity.valid then
-      local depot_frame = gui[index]
-      if not depot_frame then
-        depot_frame = gui.add{type = "flow", name = index, direction = "horizontal"}
-        depot_frame.style.horizontally_stretchable = true
-        depot_frame.style.vertical_align = "center"
-        
-        local map_button = depot_frame.add {
-          type = "sprite-button",
-          name = "open_depot_map_" .. depot.index,
-          sprite = "utility/custom_tag_in_map_view"
-        }
-        map_button.style.width = 32
-        map_button.style.height = 32
-      end
-      update_fuel_depot_gui(depot, depot_frame)
-    end
-  end
-
-  for k, gui in pairs (gui.children) do
-    if not depots[gui.name] then
-      gui.destroy()
-    end
-  end
+  update_depot_tab(depots, gui, filter, function(depot, gui) update_fuel_depot_gui(depot, gui) end)
 end
 
 local refresh_fuel_tab = function(player, force)
@@ -626,7 +631,6 @@ local add_fuel_tab = function(tabbed_pane, network, filter)
   tabbed_pane.add_tab(fuel_tab, contents)
 end
 
-local floor = math.floor
 local update_request_depot_gui = function(depot, gui, filter)
 
   local flow = gui.holding_flow
@@ -726,35 +730,7 @@ local update_request_depot_gui = function(depot, gui, filter)
 end
 
 local update_request_tab = function(depots, gui, filter)
-
-  if not depots then return end
-
-  for index, depot in pairs (depots) do
-    if depot.entity.valid then
-      local depot_frame = gui[index]
-      if not depot_frame then
-        depot_frame = gui.add { type = "flow", name = index, direction = "horizontal" }
-        depot_frame.style.horizontally_stretchable = true
-        depot_frame.style.vertical_align = "center"
-        
-        local map_button = depot_frame.add {
-          type = "sprite-button",
-          name = "open_depot_map_" .. depot.index,
-          sprite = "utility/custom_tag_in_map_view"
-        }
-        map_button.style.width = 32
-        map_button.style.height = 32
-      end
-      update_request_depot_gui(depot, depot_frame, filter)
-    end
-  end
-
-  for k, gui in pairs (gui.children) do
-    if not depots[gui.name] then
-      gui.destroy()
-    end
-  end
-
+  update_depot_tab(depots, gui, filter, update_request_depot_gui)
 end
 
 local update_buffer_depot_gui = function(depot, gui, filter)
@@ -839,35 +815,7 @@ local update_buffer_depot_gui = function(depot, gui, filter)
 end
 
 local update_buffer_tab = function(depots, gui, filter)
-
-  if not depots then return end
-
-  for index, depot in pairs (depots) do
-    if depot.entity.valid then
-      local depot_frame = gui[index]
-      if not depot_frame then
-        depot_frame = gui.add{type = "flow", name = index, direction = "horizontal"}
-        depot_frame.style.horizontally_stretchable = true
-        depot_frame.style.vertical_align = "center"
-        
-        local map_button = depot_frame.add {
-          type = "sprite-button",
-          name = "open_depot_map_" .. depot.index,
-          sprite = "utility/custom_tag_in_map_view"
-        }
-        map_button.style.width = 32
-        map_button.style.height = 32
-      end
-      update_buffer_depot_gui(depot, depot_frame, filter)
-    end
-  end
-
-  for k, gui in pairs (gui.children) do
-    if not depots[gui.name] then
-      gui.destroy()
-    end
-  end
-
+  update_depot_tab(depots, gui, filter, update_buffer_depot_gui)
 end
 
 
@@ -906,7 +854,6 @@ local add_request_tab = function(tabbed_pane, network, filter)
 end
 
 local buffer_map_size = 64 * 3
-local floor = math.floor
 local add_buffer_tab = function(tabbed_pane, network, filter)
   local buffer_tab = tabbed_pane.add{type = "tab", caption = {"buffer-depots"}}
   local contents = tabbed_pane.add{type = "scroll-pane", name = "buffer_tab", style = "naked_scroll_pane"}
@@ -925,16 +872,16 @@ local add_buffer_tab = function(tabbed_pane, network, filter)
   tabbed_pane.add_tab(buffer_tab, contents)
 end
 
-local make_network_gui = function(inner, network)
+local make_network_gui = function(inner, network, filter)
 
   local tabbed_pane = inner.add{type = "tabbed-pane", name = "tab_pane"}
-  add_contents_tab(tabbed_pane, network)
-  add_supply_tab(tabbed_pane, network)
-  add_fluid_tab(tabbed_pane, network)
+  add_contents_tab(tabbed_pane, network, filter)
+  add_supply_tab(tabbed_pane, network, filter)
+  add_fluid_tab(tabbed_pane, network, filter)
   -- add_mining_tab(tabbed_pane, network)
-  add_fuel_tab(tabbed_pane, network)
-  add_request_tab(tabbed_pane, network)
-  add_buffer_tab(tabbed_pane, network)
+  add_fuel_tab(tabbed_pane, network, filter)
+  add_request_tab(tabbed_pane, network, filter)
+  add_buffer_tab(tabbed_pane, network, filter)
   tabbed_pane.selected_tab_index = 1
 
 end
@@ -957,7 +904,7 @@ local refresh_network_gui = function(player, selected_index)
   local filter = subheader.add{type = "choose-elem-button", name = "depot_filter_button", elem_type = "signal"}
   subheader.style.right_padding = 12
 
-  make_network_gui(inner, network)
+  make_network_gui(inner, network, nil)
 
 end
 
@@ -979,11 +926,9 @@ local refresh_gui = function(player, force)
   
   if not network then
     local networks = road_network.get_networks()
-    local net_count = 0
     for k, net in pairs(networks) do
-      net_count = net_count + 1
       network = net
-      player_selected_networks[player.index] = 1
+      player_selected_networks[player.index] = k
       break
     end
     if not network then
@@ -1035,35 +980,35 @@ local refresh_gui = function(player, force)
     local net_count = 0
     for _ in pairs(networks) do net_count = net_count + 1 end
     
-    local selected = player_selected_networks[player.index] or 1
+    local selected = player_selected_networks[player.index]
     local big = 0
-    local count = 0
     
     for k, net in pairs(networks) do
-      count = count + 1
-      if not selected then selected = count end
-      local size = network_size(net)
-      if size > big then
-        big = size
-        selected = count
+      if not selected then
+        local size = network_size(net)
+        if size > big then
+          big = size
+          selected = k
+        end
       end
       
       local node_count = count_network_nodes(k)
       local depot_count = count_network_depots(net)
       local drone_count = count_network_drones(net)
-      local color = get_network_color(count)
+      local color = get_network_color(k)
+      local surface_name = get_network_surface_name(net, k)
       
       local network_row = network_list.add{
         type = "flow",
         direction = "horizontal",
-        name = "network_row_" .. count
+        name = "network_row_" .. k
       }
       network_row.style.minimal_height = 40
       network_row.style.minimal_width = 230
       
       local color_indicator = network_row.add{
         type = "label",
-        name = "network_color_" .. count,
+        name = "network_color_" .. k,
         caption = "■",
         tooltip = {"", {"gui.network-id", k}}
       }
@@ -1075,14 +1020,15 @@ local refresh_gui = function(player, force)
       
       local network_button = network_row.add{
         type = "button",
-        name = "network_button_" .. count,
+        name = "network_button_" .. k,
         style = "slot_button",
-        caption = {"networkid-nodecount", k, node_count},
+        caption = {"gui.network_lable", k, node_count},
         tooltip = {"",
           {"gui.network-id", k}, "\n",
           {"gui.network-nodes", node_count}, "\n",
           {"gui.network-depots", depot_count}, "\n",
-          {"gui.network-drones", drone_count}
+          {"gui.network-drones", drone_count}, "\n",
+          {"gui.network-surface", surface_name}
         }
       }
       network_button.style.minimal_height = 36
@@ -1094,7 +1040,7 @@ local refresh_gui = function(player, force)
       
       local focus_button = network_row.add{
         type = "sprite-button",
-        name = "network_focus_" .. count,
+        name = "network_focus_" .. k,
         sprite = "utility/go_to_arrow",
         tooltip = {"gui.focus-network"},
         style = "frame_action_button"
@@ -1103,10 +1049,20 @@ local refresh_gui = function(player, force)
       focus_button.style.minimal_width = 36
     end
     
-    if count > 0 then
-      if type(selected) ~= "number" or selected < 1 or selected > count then
-        selected = 1
+    if net_count > 0 then
+      if not selected then
+        for k, net in pairs(networks) do
+          selected = k
+          network = net
+          break
+        end
       end
+      
+      local network_by_id = get_network_by_id(selected)
+      if network_by_id then
+        network = network_by_id
+      end
+      
       player_selected_networks[player.index] = selected
       
       local selected_row = network_list["network_row_" .. selected]
@@ -1214,61 +1170,32 @@ local open_gui = function(player, network_index)
 
   local selected
   local big = 0
-  local count = 0
 
   for k, network in pairs(networks) do
-    count = count + 1
-    if not selected then selected = count end
+    if not selected then selected = k end
     local size = network_size(network)
     if size > big then
       big = size
-      selected = count
+      selected = k
     end
 
     local node_count = count_network_nodes(k)
     local depot_count = count_network_depots(network)
     local drone_count = count_network_drones(network)
-    local color = get_network_color(count)
-
-    local surface_name = ""
-    for category, depots in pairs(network.depots) do
-      for _, depot in pairs(depots) do
-        if depot.entity and depot.entity.valid then
-          surface_name = depot.entity.surface.name
-          break
-        end
-      end
-      if surface_name ~= "" then break end
-    end
-    
-    if surface_name == "" then
-      local node_map = road_network.get_node_map()
-      for surface_index, surface_map in pairs(node_map) do
-        local surface_obj = game.surfaces[surface_index]
-        for x, x_map in pairs(surface_map) do
-          for y, node in pairs(x_map) do
-            if node.id == k then
-              surface_name = surface_obj.name
-              break
-            end
-          end
-          if surface_name ~= "" then break end
-        end
-        if surface_name ~= "" then break end
-      end
-    end
+    local color = get_network_color(k)
+    local surface_name = get_network_surface_name(network, k)
 
     local network_row = network_list.add{
       type = "flow",
       direction = "horizontal",
-      name = "network_row_" .. count
+      name = "network_row_" .. k
     }
     network_row.style.minimal_height = 40
     network_row.style.minimal_width = 230
 
     local color_indicator = network_row.add{
       type = "label",
-      name = "network_color_" .. count,
+      name = "network_color_" .. k,
       caption = "■",
       tooltip = {"", {"gui.network-id", k}}
     }
@@ -1280,9 +1207,9 @@ local open_gui = function(player, network_index)
 
     local network_button = network_row.add{
       type = "button",
-      name = "network_button_" .. count,
+      name = "network_button_" .. k,
       style = "slot_button",
-      caption = {"gui.network_lable", count, node_count},
+      caption = {"gui.network_lable", k, node_count},
       tooltip = {"",
         {"gui.network-id", k}, "\n",
         {"gui.network-nodes", node_count}, "\n",
@@ -1300,7 +1227,7 @@ local open_gui = function(player, network_index)
 
     local focus_button = network_row.add{
       type = "sprite-button",
-      name = "network_focus_" .. count,
+      name = "network_focus_" .. k,
       sprite = "utility/go_to_arrow",
       tooltip = {"gui.focus-network"},
       style = "frame_action_button"
@@ -1309,13 +1236,16 @@ local open_gui = function(player, network_index)
     focus_button.style.minimal_width = 36
   end
 
-  if count == 0 then return end
+  if not selected then return end
 
-  selected = network_index or selected
-
-  if type(selected) ~= "number" or selected < 1 or selected > count then
-    selected = 1
+  if network_index then
+    local network_by_index = get_network_by_id(network_index)
+    if network_by_index then
+      selected = network_index
+    end
   end
+
+  local network = get_network_by_id(selected)
 
   player_selected_networks[player.index] = selected
 
@@ -1339,7 +1269,7 @@ local open_gui = function(player, network_index)
   local filter = subheader.add{type = "choose-elem-button", name = "depot_filter_button", elem_type = "signal"}
   subheader.style.right_padding = 12
 
-  make_network_gui(inner, get_network_by_dropdown_index(selected))
+  make_network_gui(inner, network, nil)
 
   if not frame.auto_center then frame.auto_center = true end
   player.opened = frame
@@ -1366,84 +1296,72 @@ local toggle_gui = function(event)
     return
   end
 
-  local nearby_network_index
+  local nearby_network_id
 
   local nearby_road_tile = player.surface.find_tiles_filtered{name = "transport-drone-road", limit = 1, position = player.position, radius = 32}[1]
 
   if nearby_road_tile then
       local node = road_network.get_node(player.surface.index, nearby_road_tile.position.x, nearby_road_tile.position.y)
       if node then
-        local network_id = node.id
-        local count = 1
-        for id, network in pairs (road_network.get_networks()) do
-          if id == network_id then
-            nearby_network_index = count
-            break
-          end
-          count = count + 1
-        end
+        nearby_network_id = node.id
       end
   end
 
-  open_gui(player, nearby_network_index)
+  open_gui(player, nearby_network_id)
 
 end
 
-local focus_on_network_node = function(player, network_index)
+local focus_on_network_node = function(player, network_id)
   
   local networks = road_network.get_networks()
   local node_map = road_network.get_node_map()
   
-  
-  local count = 0
-  for network_id, network in pairs(networks) do
-    count = count + 1
-    
-    if count == network_index then
+  local network = networks[network_id]
+  if not network then
+    return
+  end
       
-      for surface_index, surface_map in pairs(node_map) do
-        local surface_obj = game.surfaces[surface_index]
-        
-        if surface_obj then
-          for x, x_map in pairs(surface_map) do
-            for y, node in pairs(x_map) do
-              if node.id == network_id then
-                
-                player.set_controller{
-                  type = defines.controllers.remote,
-                  surface = surface_obj,
-                  position = {x, y}
-                }
-                player.zoom = 0.5
-                
-                local color = get_network_color(network_index)
-                local label_id = rendering.draw_text{
-                  text = { "gui.network-id", network_index },
-                  target = {x, y + 1},
-                  surface = surface_obj,
-                  color = color,
-                  players = {player.index},
-                  time_to_live = 120
-                }
-                
-                local circle_id = rendering.draw_circle{
-                  color = {r=color.r, g=color.g, b=color.b, a=0.8},
-                  radius = 1,
-                  width = 4,
-                  target = {x, y},
-                  surface = surface_obj,
-                  players = {player.index},
-                  time_to_live = 120,
-                  draw_on_ground = true
-                }
-                
-                return
-              end
-            end
+  for surface_index, surface_map in pairs(node_map) do
+    local surface_obj = game.surfaces[surface_index]
+    
+    if surface_obj then
+      for x, x_map in pairs(surface_map) do
+        for y, node in pairs(x_map) do
+          if node.id == network_id then
+            
+            player.set_controller{
+              type = defines.controllers.remote,
+              surface = surface_obj,
+              position = {x, y}
+            }
+            player.zoom = 0.5
+            
+            local color = get_network_color(network_id)
+            local label_id = rendering.draw_text{
+              text = { "gui.network-id", network_id },
+              target = {x, y + 1},
+              surface = surface_obj,
+              color = color,
+              players = {player.index},
+              time_to_live = 120
+            }
+            
+            local circle_id = rendering.draw_circle{
+              color = {r=color.r, g=color.g, b=color.b, a=0.8},
+              radius = 1,
+              width = 4,
+              target = {x, y},
+              surface = surface_obj,
+              players = {player.index},
+              time_to_live = 120,
+              draw_on_ground = true
+            }
+            
+            return
           end
-        else
         end
       end
+    else
     end
   end
   
@@ -1618,17 +1536,17 @@ local on_gui_click = function(event)
 
   local network_match = gui.name:match("network_button_(%d+)")
   if network_match then
-    local network_index = tonumber(network_match)
-    player_selected_networks[player.index] = network_index
-    open_gui(player, network_index)
+    local network_id = tonumber(network_match)
+    player_selected_networks[player.index] = network_id
+    open_gui(player, network_id)
     return
   end
 
   local focus_match = gui.name:match("network_focus_(%d+)")
   if focus_match then
-    local network_index = tonumber(focus_match)
+    local network_id = tonumber(focus_match)
 
-    focus_on_network_node(player, network_index)
+    focus_on_network_node(player, network_id)
     return
   end
 
