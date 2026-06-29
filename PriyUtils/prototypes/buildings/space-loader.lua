@@ -45,6 +45,7 @@ data:extend({
     placeable_by = { item = "priy-space-loader", count = 1 },
     max_health = 300,
     filter_count = 5,
+    next_upgrade = "priy-deep-space-loader",
     corpse = "small-remnants",
     resistances = {
       { type = "fire", percent = 90 },

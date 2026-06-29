@@ -9,7 +9,7 @@ data:extend(
     type = "item",
     name = "priyutils-dug-water", --普通挖水材料
     icon = "__PriyUtils__/graphics/icons/dug-water.png",
-    icon_size = 32,
+    icon_size = 128,
     subgroup = "terrain",
     order = "z[priyutils-dug]-a[priyutils-dug-water]",
     inventory_move_sound = item_sounds.landfill_inventory_move,
@@ -30,7 +30,7 @@ data:extend(
     type = "item",
     name = "priyutils-dug-water-super", --超级挖水材料
     icon = "__PriyUtils__/graphics/icons/dug-water-super.png",
-    icon_size = 32,
+    icon_size = 128,
     subgroup = "terrain",
     order = "z[priyutils-dug]-b[priyutils-dug-water-super]",
     inventory_move_sound = item_sounds.landfill_inventory_move,

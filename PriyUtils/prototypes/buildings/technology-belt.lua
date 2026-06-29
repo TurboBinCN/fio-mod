@@ -1,4 +1,4 @@
-﻿data:extend({
+data:extend({
   {
     type = "technology",
     name = "kr-logistic-4",

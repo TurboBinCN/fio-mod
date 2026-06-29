@@ -1,4 +1,4 @@
-﻿data:extend({
+data:extend({
     {
       type = "corpse",
       name = "kr-big-random-pipes-remnant",

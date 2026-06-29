@@ -9,8 +9,7 @@ data:extend(
     category = "crafting-with-fluid",
     ingredients =
     {
-      {type = "fluid", name = "water", amount = 50},
-      {type = "item", name = "barrel", amount = 1}
+      {type = "fluid", name = "water", amount = 50}
     },
     results = {{type="item", name="priyutils-dug-water", amount=1}}
   },
@@ -18,7 +17,7 @@ data:extend(
     type = "recipe",
     name = "priyutils-dug-water-super",
     icon = "__PriyUtils__/graphics/icons/dug-water-super.png",
-    icon_size = 32,
+    icon_size = 128,
     subgroup = "terrain",
     order = "z[priyutils-dug]-b[priyutils-dug-water-super]",
     energy_required = 2,
@@ -27,9 +26,7 @@ data:extend(
     category = "crafting-with-fluid",
     ingredients =
     {
-      {type = "fluid", name = "water", amount = 500},
-      {type = "item", name = "barrel", amount = 1},
-      {type = "item", name = "explosives", amount = 3}
+      {type = "fluid", name = "water", amount = 500}
     },
     results = {
       {type = "item", name="priyutils-dug-water-super", amount=1, probability = 0.9, show_details_in_recipe_tooltip = false},

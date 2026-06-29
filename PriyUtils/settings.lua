@@ -76,17 +76,66 @@ data:extend({
     default_value = 5
     },
 
-    --泵浦速率
+    -- 采矿机速度倍数
     {
-    type = "double-setting",
-    name = "priyutils-pump-speed",
-    localised_name = "泵浦速率倍数",
-    localised_description = "使用 1 作为倍数以获得基础游戏速度",
-    setting_type = "startup",
-    minimum_value = 0,
-    default_value = 1
+        type = "double-setting",
+        name = "priyutils-mining-drill-output-speed-factor",
+        localised_name = {"mod-setting-name.priyutils-mining-drill-output-speed-factor"},
+        localised_description = {"mod-setting-description.priyutils-mining-drill-output-speed-factor"},
+        setting_type = "startup",
+        default_value = 1,
+        minimum_value = 0.01,
+        maximum_value = 1000,
+        order = "a"
     },
-    
+    -- 采矿机区域大小倍数
+    {
+        type = "double-setting",
+        name = "priyutils-mining-drill-mining-area-size",
+        localised_name = {"mod-setting-name.priyutils-mining-drill-mining-area-size"},
+        localised_description = {"mod-setting-description.priyutils-mining-drill-mining-area-size"},
+        setting_type = "startup",
+        default_value = 1,
+        minimum_value = 1,
+        maximum_value = 32,
+        order = "b"
+    },
+    -- 抽油机速度倍数
+    {
+        type = "double-setting",
+        name = "priyutils-pumpjack-output-speed-factor",
+        localised_name = {"mod-setting-name.priyutils-pumpjack-output-speed-factor"},
+        localised_description = {"mod-setting-description.priyutils-pumpjack-output-speed-factor"},
+        setting_type = "startup",
+        default_value = 100,
+        minimum_value = 0.01,
+        maximum_value = 100,
+        order = "c"
+    },
+    -- 额外模块槽数量
+    {
+        type = "double-setting",
+        name = "priyutils-extra-module-slots",
+        localised_name = {"mod-setting-name.priyutils-extra-module-slots"},
+        localised_description = {"mod-setting-description.priyutils-extra-module-slots"},
+        setting_type = "startup",
+        default_value = 0,
+        minimum_value = 0,
+        maximum_value = 20,
+        order = "d"
+    },
+    -- 手动排除列表
+    {
+        type = "string-setting",
+        name = "priyutils-parameter-change-exclusions",
+        localised_name = {"mod-setting-name.priyutils-parameter-change-exclusions"},
+        localised_description = {"mod-setting-description.priyutils-parameter-change-exclusions"},
+        setting_type = "startup",
+        default_value = "",
+        allow_blank = true,
+        auto_trim = true,
+        order = "e"
+    },
     -- 机械臂吞吐量设置
     {
         type = 'bool-setting',

@@ -1,5 +1,4 @@
 require ("prototypes.equipment.equipment")
-require ("prototypes.pump.pump")
 require ("prototypes.dugwater.dugwater")
 require ("prototypes.inserter.inserter")
 require ("prototypes.warehouse.warehouse")
@@ -8,3 +7,7 @@ require ("prototypes.warehouse.warehouse")
 if mods["space-exploration"] then
   require("prototypes.buildings.space-loader")
 end
+if not mods["Krastorio2"] then
+  require("prototypes.buildings.logistic-upgrade")
+end
+
