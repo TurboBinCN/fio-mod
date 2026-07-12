@@ -68,3 +68,15 @@ if not mods["Krastorio2"] then
     require("prototypes.roboport.remnants")
     require("prototypes.roboport.technology")
 end
+
+-- TRASHCAN
+require("prototypes.trashcan.trashcan")
+require("prototypes.trashcan.item")
+require("prototypes.trashcan.recipe")
+require("prototypes.trashcan.technology")
+
+-- VOID STORAGE
+require("prototypes.void-storage.void-storage")
+require("prototypes.void-storage.item")
+require("prototypes.void-storage.recipe")
+require("prototypes.void-storage.technology")
