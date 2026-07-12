@@ -137,7 +137,7 @@ local function add_entity_to_channel(entity, channel_mode, channel_name)
         link_id = link_id
     }
     
-    message_panel.debug("VoidStorage: entity %d added to channel '%s:%s'", entity.unit_number, channel_mode, channel_name)
+    -- message_panel.debug("VoidStorage: entity %d added to channel '%s:%s'", entity.unit_number, channel_mode, channel_name)
 end
 
 local function remove_entity_from_channel(entity)
@@ -175,13 +175,12 @@ local function remove_entity_from_channel(entity)
 
     if storage_type == CHANNEL_TYPE.CONTAINER and entity.valid then
         entity.link_id = 0
-        message_panel.debug("VoidStorage: container %d link_id reset to 0", entity.unit_number)
+        -- message_panel.debug("VoidStorage: container %d link_id reset to 0", entity.unit_number)
     end
     
     entities[entity.unit_number] = nil
-    message_panel.debug("VoidStorage: entity %d removed from channel '%s'", entity.unit_number, entity_data.channel_name)
+    -- message_panel.debug("VoidStorage: entity %d removed from channel '%s'", entity.unit_number, entity_data.channel_name)
 end
-
 local function sync_tank_channel(channel_key)
     if not storage or not storage.priyutils_void_storage then return end
     local channels = storage.priyutils_void_storage.tank_channels
@@ -202,32 +201,30 @@ local function sync_tank_channel(channel_key)
 
     -- ========== [Debug Log] 1. 记录同步前所有罐子的状态 ==========
     local pre_sync_total = 0
-    message_panel.debug("===== [Sync Start] Channel: " .. channel_key .. " =====")
+    -- message_panel.debug("===== [Sync Start] Channel: " .. channel_key .. " =====")
     for _, unit_data in ipairs(valid_units) do
         local entity = unit_data.entity
         local fb = entity.fluidbox[1]
-        local name = fb and entity.name or "nil"
+        local name = fb and fb.name or "nil"
         local amount = fb and fb.amount or 0
         local max_cap = entity.prototype.fluid_capacity or 0
         
         pre_sync_total = pre_sync_total + amount
-        message_panel.debug(string.format(
-            "[Pre-Sync] Unit: %d | Fluid: %s | Amount: %.2f | MaxCap: %.2f", 
-            unit_data.unit_number, name, amount, max_cap
-        ))
+        -- message_panel.debug(string.format(
+        --     "[Pre-Sync] Unit: %d | Fluid: %s | Amount: %.2f | MaxCap: %.2f", 
+        --     unit_data.unit_number, name, amount, max_cap
+        -- ))
     end
-    message_panel.debug("[Pre-Sync Total] Channel " .. channel_key .. " = " .. pre_sync_total)
-    -- ===========================================================
+    -- message_panel.debug("[Pre-Sync Total] Channel " .. channel_key .. " = " .. pre_sync_total)
 
     -- 1. 收集频道内所有罐子的液体信息
     local total_amount = 0
     local fluid_type = nil
-    local fluid_count = 0 
 
+    -- 🚀 修改点1: 遍历所有有效罐子来计算总量和主导液体类型
     for _, unit_data in ipairs(valid_units) do
         local fluid_data = unit_data.entity.fluidbox[1]
         if fluid_data and fluid_data.amount > 0 then
-            fluid_count = fluid_count + 1
             total_amount = total_amount + fluid_data.amount
             if not fluid_type then
                 fluid_type = fluid_data.name
@@ -236,77 +233,93 @@ local function sync_tank_channel(channel_key)
     end
 
     -- 2. 如果没有液体，则清空所有罐子并返回
-    if fluid_count == 0 then
+    if total_amount == 0 then -- 🚀 修改点2: 直接判断总量是否为0
         for _, unit_data in ipairs(valid_units) do
-            unit_data.entity.fluidbox[1] = nil
+             if unit_data.entity.fluidbox[1] then
+                unit_data.entity.remove_fluid({name=unit_data.entity.fluidbox[1].name, amount=unit_data.entity.fluidbox[1].amount})
+             end
             unit_data.entity_data.last_known_fluid = nil
         end
         if storage.priyutils_void_storage.channel_fluid_inventories then
             storage.priyutils_void_storage.channel_fluid_inventories[channel_key] = nil
         end
-        message_panel.debug("===== [Sync End] Channel cleared =====")
+        -- message_panel.debug("===== [Sync End] Channel cleared =====")
         return
     end
 
     -- 3. 计算平均量
-    local average_amount = total_amount / fluid_count
+    -- 🚀 修改点3: 用所有有效罐子的数量 (#valid_units) 作为分母
+    local average_amount = total_amount / #valid_units
     
-    -- 🚀 新增：定义一个差异阈值。只有当罐子液位与平均值的差距超过这个值时，才进行同步。
-    -- 这个值需要根据你的管道长度和罐子大小来调整，100 是一个不错的起点。
     local threshold = 1000.0 
+    local shared_pool_amount = 0
+    local has_changes = false
 
-    -- 4. 将平均量“推送”给频道内的每一个罐子
-    local has_changes = false -- 标记本次是否真的进行了修改
+    -- 4. 第一阶段：从液体过多的罐子中“抽水”到共享池
     for _, unit_data in ipairs(valid_units) do
         local entity = unit_data.entity
         local current_fluid_data = entity.fluidbox[1]
         local current_fluid_name = current_fluid_data and current_fluid_data.name or nil
         local current_amount = current_fluid_data and current_fluid_data.amount or 0
 
-        -- 只有当罐子为空，或者罐子里的流体与主导流体一致时，才考虑进行平均分配
-        if not current_fluid_name or current_fluid_name == fluid_type then
-            -- 🚀 核心修改：增加差异判断
-            if math.abs(current_amount - average_amount) > threshold then
-                if average_amount > 0 then
-                    entity.fluidbox[1] = {name = fluid_type, amount = average_amount}
-                else
-                    entity.fluidbox[1] = nil
-                end
+        if current_fluid_name == fluid_type then
+            if current_amount - average_amount > threshold then
+                local amount_to_remove = current_amount - average_amount
+                local actually_removed = entity.remove_fluid({name = fluid_type, amount = amount_to_remove})
+                shared_pool_amount = shared_pool_amount + actually_removed
                 has_changes = true
-                message_panel.debug(string.format("[Sync Action] Unit %d: %.2f -> %.2f", unit_data.unit_number, current_amount, average_amount))
+                -- message_panel.debug(string.format("[Sync Action - Remove] Unit %d: removed %.2f", unit_data.unit_number, actually_removed))
+            end
+        end
+    end
+
+    -- 5. 第二阶段：从共享池“注水”到液体不足的罐子
+    for _, unit_data in ipairs(valid_units) do
+        local entity = unit_data.entity
+        local current_fluid_data = entity.fluidbox[1]
+        local current_fluid_name = current_fluid_data and current_fluid_data.name or nil
+        local current_amount = current_fluid_data and current_fluid_data.amount or 0
+        
+        if shared_pool_amount <= 0 then break end
+
+        -- 🚀 修改点4: 允许向空罐子 (not current_fluid_name) 或含有正确类型液体的罐子注水
+        if (not current_fluid_name or current_fluid_name == fluid_type) then
+            if average_amount - current_amount > threshold and shared_pool_amount > 0 then
+                local amount_to_add = math.min(average_amount - current_amount, shared_pool_amount)
+                local actually_added = entity.insert_fluid({name = fluid_type, amount = amount_to_add})
+                shared_pool_amount = shared_pool_amount - actually_added
+                has_changes = true
+                -- message_panel.debug(string.format("[Sync Action - Add] Unit %d: added %.2f", unit_data.unit_number, actually_added))
             end
         end
     end
     
-    -- 如果本次没有进行任何修改，说明所有罐子液位已经足够接近，可以提前结束，避免不必要的日志输出
-    if not has_changes then
-         message_panel.debug("[Sync Skipped] Levels are balanced within threshold.")
-         message_panel.debug("===== [Sync End] Channel: " .. channel_key .. " =====")
-         return
-    end
+    -- if not has_changes then
+    --      message_panel.debug("[Sync Skipped] Levels are balanced within threshold.")
+    --      message_panel.debug("===== [Sync End] Channel: " .. channel_key .. " =====")
+    --      return
+    -- end
     
     -- ========== [Debug Log] 2. 记录同步后所有罐子的状态 ==========
     local post_sync_total = 0
     for _, unit_data in ipairs(valid_units) do
         local entity = unit_data.entity
         local fb = entity.fluidbox[1]
-        local name = fb and entity.name or "nil"
+        local name = fb and fb.name or "nil"
         local amount = fb and fb.amount or 0
         
         post_sync_total = post_sync_total + amount
-        message_panel.debug(string.format(
-            "[Post-Sync] Unit: %d | Fluid: %s | Amount: %.2f", 
-            unit_data.unit_number, name, amount
-        ))
+        -- message_panel.debug(string.format(
+        --     "[Post-Sync] Unit: %d | Fluid: %s | Amount: %.2f", 
+        --     unit_data.unit_number, name, amount
+        -- ))
     end
-    message_panel.debug(string.format(
-        "[Sync Result] Total: %.2f -> %.2f | Avg: %.2f | Count: %d", 
-        pre_sync_total, post_sync_total, average_amount, fluid_count
-    ))
-    message_panel.debug("===== [Sync End] Channel: " .. channel_key .. " =====")
-    -- ===========================================================
+    -- message_panel.debug(string.format(
+    --     "[Sync Result] Total: %.2f -> %.2f | Avg: %.2f | Count: %d", 
+    --     pre_sync_total, post_sync_total, average_amount, #valid_units
+    -- ))
+    -- message_panel.debug("===== [Sync End] Channel: " .. channel_key .. " =====")
 
-    -- 更新频道级别的缓存
     if not storage.priyutils_void_storage.channel_fluid_inventories then
         storage.priyutils_void_storage.channel_fluid_inventories = {}
     end
@@ -315,7 +328,6 @@ local function sync_tank_channel(channel_key)
         amount = total_amount 
     }
 end
-
 local function on_entity_created(event)
     local entity = event.created_entity or event.entity
     if not entity or not entity.valid then return end
