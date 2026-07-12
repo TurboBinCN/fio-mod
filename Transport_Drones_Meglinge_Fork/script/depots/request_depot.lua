@@ -469,31 +469,36 @@ function request_depot:get_current_amount()
   end
 end
 
+-- 会导致外接流体罐液体消失，决方法是使用管道泵阻断双向流动
+-- 建筑拓扑： depot -- 储液罐 -- 管道泵 
+-- 这种拓扑既可以快速推送液体，也不会导致液体消失
 function request_depot:push_fluid_hack()
   if self.mode == request_mode.fluid then
     local box = self:get_output_fluidbox()
-    local connected_pipelines = self.entity.fluidbox.get_connections(2)
-	for i, next_box in ipairs(connected_pipelines) do
+    local connected_fluids = self.entity.fluidbox.get_connections(2)
+	for i, next_box in ipairs(connected_fluids) do
 	  for j = 1, #next_box do
-		local next_fluid = next_box[j]
-		if (box and next_fluid and next_fluid.name == box.name) or not next_fluid then
-		  local old_amount = next_fluid and next_fluid.amount or 0
-		  local old_temperature = next_fluid and next_fluid.temperature or 0
-		  local space = next_box.get_capacity(j) - old_amount
-		  local push_amount = math.min(space, box and box.amount or 0)
-		  if push_amount > 0 then
-			next_box[j] = { name = box.name, amount = old_amount + push_amount, temperature = ((old_amount * old_temperature) + (push_amount * box.temperature)) / (old_amount + push_amount) }
-			local new_next_fluid = next_box[j]
-			local new_amount = new_next_fluid and new_next_fluid.amount or 0
-			local pushed_amount = math.max(new_amount - old_amount, 0)
-			box.amount = box.amount - pushed_amount
-			if box.amount <= 0 then box = nil end
-			self:set_output_fluidbox(box)
-			box = self:get_output_fluidbox()
-		  end
-		end
+      local next_fluid = next_box[j]
+      if (box and next_fluid and next_fluid.name == box.name) or not next_fluid then
+        --这里有问题，next_fluid 是 储液罐 storage_tank时，而且没有被管道泵阻断双向流动的时候获取的amount不对
+        --会导致push_amount 计算错误，会出现液体消失
+        local old_amount = next_fluid and next_fluid.amount or 0
+        local old_temperature = next_fluid and next_fluid.temperature or 0
+        local space = next_box.get_capacity(j) - old_amount
+        local push_amount = math.min(space, box and box.amount or 0)
+        if push_amount > 0 then
+        next_box[j] = { name = box.name, amount = old_amount + push_amount, temperature = ((old_amount * old_temperature) + (push_amount * box.temperature)) / (old_amount + push_amount) }
+        local new_next_fluid = next_box[j]
+        local new_amount = new_next_fluid and new_next_fluid.amount or 0
+        local pushed_amount = math.max(new_amount - old_amount, 0)
+        box.amount = box.amount - pushed_amount
+        if box.amount <= 0 then box = nil end
+        self:set_output_fluidbox(box)
+        box = self:get_output_fluidbox()
+        end
+      end
 	  end
-	end	
+	end
   end
 end
 

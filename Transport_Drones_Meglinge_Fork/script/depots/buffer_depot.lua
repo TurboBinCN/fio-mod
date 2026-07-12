@@ -389,6 +389,7 @@ function buffer_depot:update()
   self:check_drone_amount()
   self:update_circuit_writer()
   self:make_request()
+  -- self:push_fluid_hack()
   self:update_sticker()
 end
 
@@ -524,6 +525,34 @@ function buffer_depot:get_current_amount()
   if self.mode == request_mode.fluid then
     local box = self:get_output_fluidbox()
     return box and box.amount or 0
+  end
+end
+
+function buffer_depot:push_fluid_hack()
+  if self.mode == request_mode.fluid then
+    local box = self:get_output_fluidbox()
+    local connected_pipelines = self.entity.fluidbox.get_connections(2)
+	for i, next_box in ipairs(connected_pipelines) do
+	  for j = 1, #next_box do
+		local next_fluid = next_box[j]
+		if (box and next_fluid and next_fluid.name == box.name) or not next_fluid then
+		  local old_amount = next_fluid and next_fluid.amount or 0
+		  local old_temperature = next_fluid and next_fluid.temperature or 0
+		  local space = next_box.get_capacity(j) - old_amount
+		  local push_amount = math.min(space, box and box.amount or 0)
+		  if push_amount > 0 then
+			next_box[j] = { name = box.name, amount = old_amount + push_amount, temperature = ((old_amount * old_temperature) + (push_amount * box.temperature)) / (old_amount + push_amount) }
+			local new_next_fluid = next_box[j]
+			local new_amount = new_next_fluid and new_next_fluid.amount or 0
+			local pushed_amount = math.max(new_amount - old_amount, 0)
+			box.amount = box.amount - pushed_amount
+			if box.amount <= 0 then box = nil end
+			self:set_output_fluidbox(box)
+			box = self:get_output_fluidbox()
+		  end
+		end
+	  end
+	end	
   end
 end
 
