@@ -409,7 +409,7 @@ local function create_channel_gui(player, entity)
 
     local window = player.gui.relative.priyutils_void_storage_window
     window.style.width = 260
-    window.style.minimal_height = 300
+    window.style.minimal_height = 280
 
     local inner_frame = window.add{
         type = "frame",
@@ -464,27 +464,27 @@ local function create_channel_gui(player, entity)
     }
     add_channel_button.style.width = 60
 
-    local button_frame = inner_frame.add{
-        type = "flow",
-        name = "priyutils_void_storage_button_frame",
-        direction = "horizontal"
-    }
-    button_frame.style.horizontal_align = "right"
-    button_frame.style.top_padding = 8
+    -- local button_frame = inner_frame.add{
+    --     type = "flow",
+    --     name = "priyutils_void_storage_button_frame",
+    --     direction = "horizontal"
+    -- }
+    -- button_frame.style.horizontal_align = "right"
+    -- button_frame.style.top_padding = 8
 
-    local ok_button = button_frame.add{
-        type = "button",
-        name = "priyutils_void_storage_ok_button",
-        caption = {"gui.priyutils-void-storage-ok"}
-    }
-    ok_button.style.width = 60
+    -- local ok_button = button_frame.add{
+    --     type = "button",
+    --     name = "priyutils_void_storage_ok_button",
+    --     caption = {"gui.priyutils-void-storage-ok"}
+    -- }
+    -- ok_button.style.width = 60
 
-    local cancel_button = button_frame.add{
-        type = "button",
-        name = "priyutils_void_storage_cancel_button",
-        caption = {"gui.priyutils-void-storage-cancel"}
-    }
-    cancel_button.style.width = 60
+    -- local cancel_button = button_frame.add{
+    --     type = "button",
+    --     name = "priyutils_void_storage_cancel_button",
+    --     caption = {"gui.priyutils-void-storage-cancel"}
+    -- }
+    -- cancel_button.style.width = 60
 
     storage.priyutils_void_storage_open_gui = storage.priyutils_void_storage_open_gui or {}
     storage.priyutils_void_storage_open_gui[player.index] = {
@@ -617,20 +617,20 @@ local function on_gui_click(event)
         else
             message_panel.debug("VoidStorage: new_channel_name is empty")
         end
-    elseif clicked_element.name == "priyutils_void_storage_ok_button" then
-        if player.gui.relative.priyutils_void_storage_window then
-            player.gui.relative.priyutils_void_storage_window.destroy()
-        end
-        if storage.priyutils_void_storage_open_gui and storage.priyutils_void_storage_open_gui[player.index] then
-            storage.priyutils_void_storage_open_gui[player.index] = nil
-        end
-    elseif clicked_element.name == "priyutils_void_storage_cancel_button" then
-        if player.gui.relative.priyutils_void_storage_window then
-            player.gui.relative.priyutils_void_storage_window.destroy()
-        end
-        if storage.priyutils_void_storage_open_gui and storage.priyutils_void_storage_open_gui[player.index] then
-            storage.priyutils_void_storage_open_gui[player.index] = nil
-        end
+    -- elseif clicked_element.name == "priyutils_void_storage_ok_button" then
+    --     if player.gui.relative.priyutils_void_storage_window then
+    --         player.gui.relative.priyutils_void_storage_window.destroy()
+    --     end
+    --     if storage.priyutils_void_storage_open_gui and storage.priyutils_void_storage_open_gui[player.index] then
+    --         storage.priyutils_void_storage_open_gui[player.index] = nil
+    --     end
+    -- elseif clicked_element.name == "priyutils_void_storage_cancel_button" then
+    --     if player.gui.relative.priyutils_void_storage_window then
+    --         player.gui.relative.priyutils_void_storage_window.destroy()
+    --     end
+    --     if storage.priyutils_void_storage_open_gui and storage.priyutils_void_storage_open_gui[player.index] then
+    --         storage.priyutils_void_storage_open_gui[player.index] = nil
+    --     end
     end
 end
 

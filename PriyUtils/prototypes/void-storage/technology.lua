@@ -1,8 +1,8 @@
 local void_storage_technology = {
     type = "technology",
     name = "priyutils-void-storage",
-    icon = "__base__/graphics/icons/steel-chest.png",
-    icon_size = 64,
+    icon = "__PriyUtils__/graphics/icons/cartoonbox.png",
+    icon_size = 128,
     order = "e-a",
     prerequisites = {
         "steel-processing",

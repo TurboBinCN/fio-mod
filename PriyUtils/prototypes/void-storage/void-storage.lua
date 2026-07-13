@@ -5,7 +5,7 @@ local void_container_entity = {
     type = "linked-container",
     name = "priyutils-void-container",
     gui_mode = "all",
-    icon = "__base__/graphics/icons/steel-chest.png",
+    icon = "__PriyUtils__/graphics/icons/cartoonbox.png",
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     minable = {mining_time = 0.1, result = "priyutils-void-container"},
     max_health = 500,
@@ -28,12 +28,12 @@ local void_container_entity = {
       layers =
       {
         {
-          filename = "__base__/graphics/entity/steel-chest/steel-chest.png",
+          filename = "__PriyUtils__/graphics/icons/cartoonbox.png",
           priority = "extra-high",
-          width = 64,
-          height = 80,
+          width = 128,
+          height = 128,
           shift = util.by_pixel(-0.25, -0.5),
-          scale = 0.5
+          scale = 0.25
         },
         {
           filename = "__base__/graphics/entity/steel-chest/steel-chest-shadow.png",
@@ -54,7 +54,7 @@ local void_tank_entity = {
     type = "storage-tank",
     name = "priyutils-void-tank",
     icon = "__base__/graphics/icons/storage-tank.png",
-    icon_size = 64,
+    icon_size = 128,
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     minable = {mining_time = 1, result = "priyutils-void-tank"},
     max_health = 500,
