@@ -469,36 +469,58 @@ function request_depot:get_current_amount()
   end
 end
 
--- 会导致外接流体罐液体消失，决方法是使用管道泵阻断双向流动
--- 建筑拓扑： depot -- 储液罐 -- 管道泵 
--- 这种拓扑既可以快速推送液体，也不会导致液体消失
 function request_depot:push_fluid_hack()
   if self.mode == request_mode.fluid then
-    local box = self:get_output_fluidbox()
-    local connected_fluids = self.entity.fluidbox.get_connections(2)
-	for i, next_box in ipairs(connected_fluids) do
-	  for j = 1, #next_box do
-      local next_fluid = next_box[j]
-      if (box and next_fluid and next_fluid.name == box.name) or not next_fluid then
-        --这里有问题，next_fluid 是 储液罐 storage_tank时，而且没有被管道泵阻断双向流动的时候获取的amount不对
-        --会导致push_amount 计算错误，会出现液体消失
-        local old_amount = next_fluid and next_fluid.amount or 0
-        local old_temperature = next_fluid and next_fluid.temperature or 0
-        local space = next_box.get_capacity(j) - old_amount
-        local push_amount = math.min(space, box and box.amount or 0)
-        if push_amount > 0 then
-        next_box[j] = { name = box.name, amount = old_amount + push_amount, temperature = ((old_amount * old_temperature) + (push_amount * box.temperature)) / (old_amount + push_amount) }
-        local new_next_fluid = next_box[j]
-        local new_amount = new_next_fluid and new_next_fluid.amount or 0
-        local pushed_amount = math.max(new_amount - old_amount, 0)
-        box.amount = box.amount - pushed_amount
-        if box.amount <= 0 then box = nil end
-        self:set_output_fluidbox(box)
-        box = self:get_output_fluidbox()
+    local source_box = self:get_output_fluidbox()
+    if not source_box then return end
+    
+    local connected_fluidboxes = self.entity.fluidbox.get_connections(2)
+    local total_pushed_amount = 0
+
+    for _, target_fluidbox in ipairs(connected_fluidboxes) do
+      for i = 1, #target_fluidbox do
+        -- 1. 检查目标流体盒的状态 (只读)
+        local target_fluid = target_fluidbox[i]
+        local target_fluid_name = target_fluid and target_fluid.name or nil
+        local target_fluid_amount = target_fluid and target_fluid.amount or 0
+        
+        -- 2. 判断是否可以注入 (目标为空 或 液体类型相同)
+        if (not target_fluid_name) or (target_fluid_name == source_box.name) then
+          
+          -- 3. 计算可注入量
+          local target_capacity = target_fluidbox.get_capacity(i)
+          local space_available = target_capacity - target_fluid_amount
+          local amount_to_push = math.min(space_available, source_box.amount)
+
+          if amount_to_push > 0 then
+            -- 4. 执行注入操作
+            -- 注意：insert_fluid 返回的是实际注入的量，可能小于请求的量
+            local actually_pushed = target_fluidbox.owner.insert_fluid({name = source_box.name, amount = amount_to_push})
+            
+            if actually_pushed > 0 then
+              -- 5. 更新源液体量
+              source_box.amount = source_box.amount - actually_pushed
+              if(source_box.amount <= 0) then
+                source_box.amount = 0.1
+              end
+              self:set_output_fluidbox(source_box)
+              total_pushed_amount = total_pushed_amount + actually_pushed
+              
+              -- 如果源液体已耗尽，结束推送
+              if source_box.amount <= 0 then
+                break
+              end
+            end
+          end
         end
       end
-	  end
-	end
+      -- 如果源液体已耗尽，跳出外层循环
+      if source_box.amount <= 0 then break end
+    end
+
+    -- 记录分配后的状态
+    -- local post_push_log = string.format("[Push Fluid - End] Total Pushed: %.2f | Source Final Amount: %.2f", total_pushed_amount, source_box.amount)
+    -- message_panel:log_and_print(post_push_log)
   end
 end
 
