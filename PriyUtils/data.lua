@@ -74,3 +74,10 @@ require("prototypes.trashcan.trashcan")
 require("prototypes.trashcan.item")
 require("prototypes.trashcan.recipe")
 require("prototypes.trashcan.technology")
+
+
+-- VOID STORAGE
+require("prototypes.void-storage.item")
+require("prototypes.void-storage.technology")
+require("prototypes.void-storage.recipe")
+require("prototypes.void-storage.void-storage")

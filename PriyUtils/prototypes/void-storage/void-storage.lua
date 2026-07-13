@@ -54,7 +54,6 @@ local void_tank_entity = {
     type = "storage-tank",
     name = "priyutils-void-tank",
     icon = "__base__/graphics/icons/storage-tank.png",
-    icon_size = 128,
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     minable = {mining_time = 1, result = "priyutils-void-tank"},
     max_health = 500,
