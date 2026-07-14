@@ -1,4 +1,4 @@
-local VoidStorage = {}
+﻿local VoidStorage = {}
 
 local message_panel = require("scripts.message_panel")
 
@@ -49,9 +49,15 @@ local function init_storage()
             tanks = {},
             container_channels = {},
             tank_channels = {},
-            channel_fluid_inventories = {}
+            channel_fluid_inventories = {},
+            ghost_tags_cache = {}
         }
-        message_panel.debug("VoidStorage: initialized global storage")
+        -- removed debug log
+    else
+        if not storage.priyutils_void_storage.ghost_tags_cache then
+            storage.priyutils_void_storage.ghost_tags_cache = {}
+            -- removed debug log
+        end
     end
 end
 
@@ -60,6 +66,12 @@ local function get_entity_storage_type(entity)
         return CHANNEL_TYPE.CONTAINER
     elseif entity.name == "priyutils-void-tank" then
         return CHANNEL_TYPE.TANK
+    elseif entity.type == "entity-ghost" then
+        if entity.ghost_name == "priyutils-void-container" then
+            return CHANNEL_TYPE.CONTAINER
+        elseif entity.ghost_name == "priyutils-void-tank" then
+            return CHANNEL_TYPE.TANK
+        end
     end
     return nil
 end
@@ -122,10 +134,7 @@ local function add_entity_to_channel(entity, channel_mode, channel_name)
         entity.link_id = link_id
         local current_link_id = entity.link_id
         
-        message_panel.debug("VoidStorage: container %d - channel_key: '%s', computed link_id: %d, previous: %s, current: %s", 
-            entity.unit_number, channel_key, link_id, 
-            previous_link_id and tostring(previous_link_id) or "nil", 
-            current_link_id and tostring(current_link_id) or "nil")
+        -- debug log removed
     end
 
     entities[entity.unit_number] = {
@@ -328,25 +337,156 @@ local function sync_tank_channel(channel_key)
         amount = total_amount 
     }
 end
+local function restore_entity_from_tags(entity, tags)
+    if tags and tags.void_storage_channel_mode and tags.void_storage_channel_name then
+        add_entity_to_channel(entity, tags.void_storage_channel_mode, tags.void_storage_channel_name)
+        -- removed debug log
+        return true
+    end
+    return false
+end
+
+local function restore_entity_from_cache(entity)
+    local cache_key = string.format("%s_%.6f_%.6f", entity.surface.name, entity.position.x, entity.position.y)
+    local cached_tags = storage.priyutils_void_storage.ghost_tags_cache[cache_key]
+    
+    -- removed debug log
+    if cached_tags then
+        add_entity_to_channel(entity, cached_tags.channel_mode, cached_tags.channel_name)
+        storage.priyutils_void_storage.ghost_tags_cache[cache_key] = nil
+        -- removed debug log
+        return true
+    end
+    
+    for key, value in pairs(storage.priyutils_void_storage.ghost_tags_cache) do
+        -- removed debug log
+    end
+    
+    return false
+end
+
 local function on_entity_created(event)
+    -- removed debug log
     local entity = event.created_entity or event.entity
-    if not entity or not entity.valid then return end
+    if not entity or not entity.valid then 
+        -- removed debug log
+        return 
+    end
 
+    -- removed debug log
     local storage_type = get_entity_storage_type(entity)
-    if not storage_type then return end
+    if not storage_type then 
+        -- removed debug log
+        return 
+    end
 
-    local default_mode, default_name = get_default_channel(entity)
-    add_entity_to_channel(entity, default_mode, default_name)
+    local event_tags = event.tags
+    local entity_tags = entity.tags
+    
+    local event_tags_str = "nil"
+    if event_tags then
+        event_tags_str = string.format("{mode=%s,channel=%s}", 
+            event_tags.void_storage_channel_mode or "nil",
+            event_tags.void_storage_channel_name or "nil")
+    end
+    local entity_tags_str = "nil"
+    if entity_tags then
+        entity_tags_str = string.format("{mode=%s,channel=%s}", 
+            entity_tags.void_storage_channel_mode or "nil",
+            entity_tags.void_storage_channel_name or "nil")
+    end
+    -- removed debug log
+    if restore_entity_from_tags(entity, event_tags) then return end
+    if restore_entity_from_tags(entity, entity_tags) then return end
+    if restore_entity_from_cache(entity) then return end
+
+    local channel_mode, channel_name = get_default_channel(entity)
+    add_entity_to_channel(entity, channel_mode, channel_name)
 end
 
 local function on_entity_removed(event)
     local entity = event.entity
     if not entity or not entity.valid then return end
 
+    -- debug log removed
+
     local storage_type = get_entity_storage_type(entity)
+    if not storage_type then 
+        -- removed debug log
+        return 
+    end
+
+    if entity.type == "entity-ghost" then
+        -- removed debug log
+        local tags = entity.tags
+        local tags_str = "nil"
+        if tags then
+            tags_str = string.format("{mode=%s,channel=%s}", 
+                tags.void_storage_channel_mode or "nil",
+                tags.void_storage_channel_name or "nil")
+        end
+        -- removed debug log
+        local channel_mode, channel_name
+        
+        if tags and tags.void_storage_channel_mode and tags.void_storage_channel_name then
+            channel_mode = tags.void_storage_channel_mode
+            channel_name = tags.void_storage_channel_name
+        else
+            local ghost_name = entity.ghost_name
+            if ghost_name then
+                local storage_type = get_entity_storage_type(entity)
+                if storage_type then
+                    local entities = storage_type == CHANNEL_TYPE.CONTAINER
+                        and storage.priyutils_void_storage.containers
+                        or storage.priyutils_void_storage.tanks
+                    
+                    local entity_data = entities[entity.unit_number]
+                    if entity_data then
+                        channel_mode = entity_data.channel_mode
+                        channel_name = entity_data.channel_name
+                        -- removed debug log
+                    end
+                end
+            end
+        end
+        
+        if channel_mode and channel_name then
+            local cache_key = string.format("%s_%.6f_%.6f", entity.surface.name, entity.position.x, entity.position.y)
+            storage.priyutils_void_storage.ghost_tags_cache[cache_key] = {
+                channel_mode = channel_mode,
+                channel_name = channel_name,
+                tick = game.tick
+            }
+            -- removed debug log
+        else
+            -- removed debug log
+        end
+    else
+        remove_entity_from_channel(entity)
+    end
+end
+
+local function on_post_entity_died(event)
+    if not event.ghost or not event.unit_number then return end
+
+    local ghost_entity = event.ghost
+    if not ghost_entity or not ghost_entity.valid then return end
+
+    local storage_type = get_entity_storage_type(ghost_entity)
     if not storage_type then return end
 
-    remove_entity_from_channel(entity)
+    local entities = storage_type == CHANNEL_TYPE.CONTAINER
+        and storage.priyutils_void_storage.containers
+        or storage.priyutils_void_storage.tanks
+
+    local entity_data = entities[event.unit_number]
+    if entity_data then
+        ghost_entity.tags = {
+            void_storage_channel_mode = entity_data.channel_mode,
+            void_storage_channel_name = entity_data.channel_name
+        }
+        -- removed debug log
+    end
 end
 
 local function create_channel_gui(player, entity)
@@ -358,19 +498,28 @@ local function create_channel_gui(player, entity)
     local storage_type = get_entity_storage_type(entity)
     if not storage_type then return end
 
-    local entities = storage_type == CHANNEL_TYPE.CONTAINER
-        and storage.priyutils_void_storage.containers
-        or storage.priyutils_void_storage.tanks
+    local is_ghost = entity.type == "entity-ghost"
+    local current_mode, current_channel
 
-    local entity_data = entities[entity.unit_number]
-    if not entity_data then
-        local default_mode, default_name = get_default_channel(entity)
-        add_entity_to_channel(entity, default_mode, default_name)
-        entity_data = entities[entity.unit_number]
+    if is_ghost and entity.tags and entity.tags.void_storage_channel_mode and entity.tags.void_storage_channel_name then
+        current_mode = entity.tags.void_storage_channel_mode
+        current_channel = entity.tags.void_storage_channel_name
+    else
+        local entities = storage_type == CHANNEL_TYPE.CONTAINER
+            and storage.priyutils_void_storage.containers
+            or storage.priyutils_void_storage.tanks
+
+        local entity_data = entities[entity.unit_number]
+        if not entity_data then
+            local default_mode, default_name = get_default_channel(entity)
+            add_entity_to_channel(entity, default_mode, default_name)
+            entity_data = entities[entity.unit_number]
+        end
+
+        current_mode = entity_data.channel_mode or CHANNEL_MODE.LOCAL
+        current_channel = entity_data.channel_name
     end
 
-    local current_mode = entity_data.channel_mode or CHANNEL_MODE.LOCAL
-    local current_channel = entity_data.channel_name
     local channels = storage_type == CHANNEL_TYPE.CONTAINER
         and storage.priyutils_void_storage.container_channels
         or storage.priyutils_void_storage.tank_channels
@@ -403,6 +552,8 @@ local function create_channel_gui(player, entity)
         anchor = {
             gui = relative_gui_type,
             position = defines.relative_gui_position.right,
+            names = { "priyutils-void-container", "priyutils-void-tank" },
+            ghost_mode = "both"
         },
         direction = "vertical"
     }
@@ -544,17 +695,16 @@ local function on_gui_click(event)
     if not clicked_element then return end
 
     if clicked_element.name == "priyutils_add_channel_button" then
-        message_panel.debug("VoidStorage: add_channel_button clicked")
-        
+        -- removed debug log
         local window = player.gui.relative.priyutils_void_storage_window
         if not window then 
-            message_panel.debug("VoidStorage: window not found")
+            -- removed debug log
             return 
         end
         
         local inner_frame = window.priyutils_void_storage_inner_frame
         if not inner_frame then 
-            message_panel.debug("VoidStorage: inner_frame not found")
+            -- removed debug log
             return 
         end
         
@@ -563,23 +713,37 @@ local function on_gui_click(event)
         
         local new_channel_flow = inner_frame.priyutils_new_channel_flow
         if not new_channel_flow then 
-            message_panel.debug("VoidStorage: new_channel_flow not found")
+            -- removed debug log
             return 
         end
         
         local textfield = new_channel_flow.priyutils_new_channel_textfield
         if not textfield then 
-            message_panel.debug("VoidStorage: textfield not found")
+            -- removed debug log
             return 
         end
         
         local new_channel_name = textfield.text:gsub("^%s*(.-)%s*$", "%1")
-        message_panel.debug("VoidStorage: new_channel_name = '" .. (new_channel_name or "") .. "', mode = " .. channel_mode)
+        -- debug log removed
         
         if new_channel_name and new_channel_name ~= "" then
-            remove_entity_from_channel(entity)
-            add_entity_to_channel(entity, channel_mode, new_channel_name)
-            message_panel.debug("VoidStorage: entity added to new channel '" .. channel_mode .. ":" .. new_channel_name .. "'")
+            if entity.type == "entity-ghost" then
+                entity.tags = {
+                    void_storage_channel_mode = channel_mode,
+                    void_storage_channel_name = new_channel_name
+                }
+                local cache_key = string.format("%s_%.1f_%.1f", entity.surface.name, entity.position.x, entity.position.y)
+                storage.priyutils_void_storage.ghost_tags_cache[cache_key] = {
+                    channel_mode = channel_mode,
+                    channel_name = new_channel_name,
+                    tick = game.tick
+                }
+                -- removed debug log
+            else
+                remove_entity_from_channel(entity)
+                add_entity_to_channel(entity, channel_mode, new_channel_name)
+                -- removed debug log
+            end
 
             local channels = storage_type == CHANNEL_TYPE.CONTAINER
                 and storage.priyutils_void_storage.container_channels
@@ -598,24 +762,24 @@ local function on_gui_click(event)
                         end
                     end
                 end
-                message_panel.debug("VoidStorage: refreshing channel list, total channels: " .. #existing_channels)
+                -- removed debug log
                 channel_list.items = existing_channels
                 
                 for i, name in ipairs(existing_channels) do
                     if name == new_channel_name then
                         channel_list.selected_index = i
-                        message_panel.debug("VoidStorage: selected_index set to " .. i)
+                        -- removed debug log
                         break
                     end
                 end
             else
-                message_panel.debug("VoidStorage: channel_list not found")
+                -- removed debug log
             end
 
             textfield.text = ""
-            message_panel.debug("VoidStorage: textfield cleared")
+            -- removed debug log
         else
-            message_panel.debug("VoidStorage: new_channel_name is empty")
+            -- removed debug log
         end
     -- elseif clicked_element.name == "priyutils_void_storage_ok_button" then
     --     if player.gui.relative.priyutils_void_storage_window then
@@ -661,6 +825,23 @@ local function on_gui_switch_state_changed(event)
             and storage.priyutils_void_storage.container_channels
             or storage.priyutils_void_storage.tank_channels
         
+        if entity.type == "entity-ghost" then
+            local existing_tags = entity.tags or {}
+            local _, default_name = get_default_channel(entity)
+            local channel_name = existing_tags.void_storage_channel_name or default_name
+            entity.tags = {
+                void_storage_channel_mode = channel_mode,
+                void_storage_channel_name = channel_name
+            }
+            local cache_key = string.format("%s_%.1f_%.1f", entity.surface.name, entity.position.x, entity.position.y)
+            storage.priyutils_void_storage.ghost_tags_cache[cache_key] = {
+                channel_mode = channel_mode,
+                channel_name = channel_name,
+                tick = game.tick
+            }
+            -- removed debug log
+        end
+        
         local existing_channels = {}
         local surface_name = entity and entity.surface and entity.surface.name or nil
         local prefix = get_channel_key_prefix(storage_type, channel_mode, surface_name)
@@ -679,12 +860,17 @@ local function on_gui_switch_state_changed(event)
             channel_list.selected_index = 0
         end
         
-        message_panel.debug("VoidStorage: mode switched to " .. channel_mode)
+        -- removed debug log
     end
 end
 
 local function on_gui_selection_state_changed(event)
-    if not storage or not storage.priyutils_void_storage then return end
+    if not storage then storage = {} end
+    if not storage.priyutils_void_storage then init_storage() end
+    
+    if not storage.priyutils_void_storage.ghost_tags_cache then
+        storage.priyutils_void_storage.ghost_tags_cache = {}
+    end
     
     local player = game.get_player(event.player_index)
     if not player then return end
@@ -713,35 +899,49 @@ local function on_gui_selection_state_changed(event)
             local mode_switch = inner_frame.priyutils_void_storage_mode_switch
             local channel_mode = mode_switch and mode_switch.switch_state == "right" and CHANNEL_MODE.GLOBAL or CHANNEL_MODE.LOCAL
             
-            local entities = storage_type == CHANNEL_TYPE.CONTAINER
-                and storage.priyutils_void_storage.containers
-                or storage.priyutils_void_storage.tanks
-            local entity_data = entities[entity.unit_number]
-            if entity_data and (entity_data.channel_name ~= selected_channel or entity_data.channel_mode ~= channel_mode) then
-                local saved_items = nil
-                if storage_type == CHANNEL_TYPE.CONTAINER then
-                    local inv = entity.get_inventory(defines.inventory.chest)
-                    if inv and inv.valid then
-                        saved_items = {}
-                        for slot = 1, #inv do
-                            local stack = inv[slot]
-                            if stack and stack.valid and stack.valid_for_read then
-                                table.insert(saved_items, {name = stack.name, count = stack.count})
+            if entity.type == "entity-ghost" then
+                entity.tags = {
+                    void_storage_channel_mode = channel_mode,
+                    void_storage_channel_name = selected_channel
+                }
+                local cache_key = string.format("%s_%.1f_%.1f", entity.surface.name, entity.position.x, entity.position.y)
+                storage.priyutils_void_storage.ghost_tags_cache[cache_key] = {
+                    channel_mode = channel_mode,
+                    channel_name = selected_channel,
+                    tick = game.tick
+                }
+                -- removed debug log
+            else
+                local entities = storage_type == CHANNEL_TYPE.CONTAINER
+                    and storage.priyutils_void_storage.containers
+                    or storage.priyutils_void_storage.tanks
+                local entity_data = entities[entity.unit_number]
+                if entity_data and (entity_data.channel_name ~= selected_channel or entity_data.channel_mode ~= channel_mode) then
+                    local saved_items = nil
+                    if storage_type == CHANNEL_TYPE.CONTAINER then
+                        local inv = entity.get_inventory(defines.inventory.chest)
+                        if inv and inv.valid then
+                            saved_items = {}
+                            for slot = 1, #inv do
+                                local stack = inv[slot]
+                                if stack and stack.valid and stack.valid_for_read then
+                                    table.insert(saved_items, {name = stack.name, count = stack.count})
+                                end
                             end
                         end
                     end
-                end
-                
-                remove_entity_from_channel(entity)
-                add_entity_to_channel(entity, channel_mode, selected_channel)
-                
-                if saved_items and #saved_items > 0 then
-                    local inv = entity.get_inventory(defines.inventory.chest)
-                    if inv and inv.valid then
-                        for _, item in ipairs(saved_items) do
-                            inv.insert({name = item.name, count = item.count})
+                    
+                    remove_entity_from_channel(entity)
+                    add_entity_to_channel(entity, channel_mode, selected_channel)
+                    
+                    if saved_items and #saved_items > 0 then
+                        local inv = entity.get_inventory(defines.inventory.chest)
+                        if inv and inv.valid then
+                            for _, item in ipairs(saved_items) do
+                                inv.insert({name = item.name, count = item.count})
+                            end
                         end
-                        message_panel.debug("VoidStorage: transferred %d item types to new channel", #saved_items)
+                        -- removed debug log
                     end
                 end
             end
@@ -750,12 +950,26 @@ local function on_gui_selection_state_changed(event)
 end
 
 local function on_tick(event)
-    if event.tick % 60 ~= 0 then return end
-
-    if not storage or not storage.priyutils_void_storage then return end
+    if not storage then storage = {} end
+    if not storage.priyutils_void_storage then init_storage() return end
+    
+    if not storage.priyutils_void_storage.ghost_tags_cache then
+        storage.priyutils_void_storage.ghost_tags_cache = {}
+        -- removed debug log
+    end
 
     for key, _ in pairs(storage.priyutils_void_storage.tank_channels) do
         sync_tank_channel(key)
+    end
+
+    local cache = storage.priyutils_void_storage.ghost_tags_cache
+    if cache then
+        for key, entry in pairs(cache) do
+            if game.tick - entry.tick > 18000 then
+                cache[key] = nil
+                -- removed debug log
+            end
+        end
     end
 end
 
@@ -772,13 +986,11 @@ local function on_load()
             local engine_link_id = entity_data.entity.link_id
             local saved_link_id = entity_data.link_id
             
-            message_panel.debug("VoidStorage: on_load container %d - engine link_id: %s, saved link_id: %s", 
-                unit_number, engine_link_id and tostring(engine_link_id) or "nil", 
-                saved_link_id and tostring(saved_link_id) or "nil")
+            -- debug log removed
             
             if saved_link_id and (not engine_link_id or engine_link_id ~= saved_link_id) then
                 entity_data.entity.link_id = saved_link_id
-                message_panel.debug("VoidStorage: restored link_id %d for container %d", saved_link_id, unit_number)
+                -- removed debug log
             end
         end
     end
@@ -788,27 +1000,261 @@ local function on_configuration_changed(data)
     if not storage then storage = {} end
     if not storage.priyutils_void_storage then
         init_storage()
+    else
+        if not storage.priyutils_void_storage.ghost_tags_cache then
+            storage.priyutils_void_storage.ghost_tags_cache = {}
+            -- removed debug log
+        end
     end
 end
 
-script.on_init(on_init)
-script.on_load(on_load)
-script.on_configuration_changed(on_configuration_changed)
+local function on_entity_settings_pasted(event)
+    local source = event.source
+    local destination = event.destination
+    if not (source and destination and source.valid and destination.valid) then return end
 
-script.on_event(defines.events.on_built_entity, on_entity_created)
-script.on_event(defines.events.on_robot_built_entity, on_entity_created)
-script.on_event(defines.events.script_raised_built, on_entity_created)
-script.on_event(defines.events.on_entity_died, on_entity_removed)
-script.on_event(defines.events.on_player_mined_entity, on_entity_removed)
-script.on_event(defines.events.on_robot_mined_entity, on_entity_removed)
-script.on_event(defines.events.script_raised_destroy, on_entity_removed)
+    local source_type = get_entity_storage_type(source)
+    local dest_type = get_entity_storage_type(destination)
+    if not source_type or not dest_type or source_type ~= dest_type then return end
 
-script.on_event(defines.events.on_gui_opened, on_gui_opened)
-script.on_event(defines.events.on_gui_closed, on_gui_closed)
-script.on_event(defines.events.on_gui_click, on_gui_click)
-script.on_event(defines.events.on_gui_selection_state_changed, on_gui_selection_state_changed)
-script.on_event(defines.events.on_gui_switch_state_changed, on_gui_switch_state_changed)
+    local source_data = nil
+    local entities = source_type == CHANNEL_TYPE.CONTAINER
+        and storage.priyutils_void_storage.containers
+        or storage.priyutils_void_storage.tanks
 
-script.on_event(defines.events.on_tick, on_tick)
+    if entities[source.unit_number] then
+        source_data = entities[source.unit_number]
+    elseif source.tags and source.tags.void_storage_channel_mode and source.tags.void_storage_channel_name then
+        source_data = {
+            channel_mode = source.tags.void_storage_channel_mode,
+            channel_name = source.tags.void_storage_channel_name
+        }
+    end
+
+    if source_data then
+        if destination.type == "entity-ghost" then
+            destination.tags = {
+                void_storage_channel_mode = source_data.channel_mode,
+                void_storage_channel_name = source_data.channel_name
+            }
+            -- removed debug log
+        else
+            local dest_entities = dest_type == CHANNEL_TYPE.CONTAINER
+                and storage.priyutils_void_storage.containers
+                or storage.priyutils_void_storage.tanks
+            
+            local dest_data = dest_entities[destination.unit_number]
+            if dest_data and (dest_data.channel_name ~= source_data.channel_name or dest_data.channel_mode ~= source_data.channel_mode) then
+                remove_entity_from_channel(destination)
+                add_entity_to_channel(destination, source_data.channel_mode, source_data.channel_name)
+                -- removed debug log
+            end
+        end
+    end
+end
+
+local function on_player_setup_blueprint(event)
+    local player = game.get_player(event.player_index)
+    local blueprint = event.stack
+    
+    -- removed debug log
+    if not (blueprint and blueprint.valid_for_read) then return end
+
+    if not (blueprint.is_blueprint or blueprint.is_blueprint_book) then return end
+
+    local mapping = event.mapping.get()
+    local blueprint_entities = blueprint.get_blueprint_entities()
+    
+    -- removed debug log
+    if not blueprint_entities then return end
+
+    -- removed debug log
+    for _, blueprint_entity in pairs(blueprint_entities) do
+        local entity = mapping[blueprint_entity.entity_number]
+        if entity and entity.valid then
+            local storage_type = get_entity_storage_type(entity)
+            if storage_type then
+                local entity_data = nil
+                
+                if entity.type == "entity-ghost" then
+                    if entity.tags and entity.tags.void_storage_channel_mode and entity.tags.void_storage_channel_name then
+                        entity_data = {
+                            channel_mode = entity.tags.void_storage_channel_mode,
+                            channel_name = entity.tags.void_storage_channel_name
+                        }
+                    end
+                else
+                    local entities = storage_type == CHANNEL_TYPE.CONTAINER
+                        and storage.priyutils_void_storage.containers
+                        or storage.priyutils_void_storage.tanks
+                    
+                    entity_data = entities[entity.unit_number]
+                end
+                
+                if entity_data then
+                    local tags = {
+                        void_storage_channel_mode = entity_data.channel_mode,
+                        void_storage_channel_name = entity_data.channel_name
+                    }
+                    blueprint.set_blueprint_entity_tags(blueprint_entity.entity_number, tags)
+                    
+                    local saved_tags = blueprint.get_blueprint_entity_tags(blueprint_entity.entity_number)
+                    if saved_tags then
+                        -- removed debug log
+                    else
+                        -- removed debug log
+                    end
+                else
+                    -- removed debug log
+                end
+            end
+        else
+            -- removed debug log
+        end
+    end
+end
+
+local function on_player_pasted_area(event)
+    local player = game.get_player(event.player_index)
+    local blueprint = event.blueprint
+    
+    -- removed debug log
+    if not (blueprint and blueprint.valid_for_read and blueprint.is_blueprint) then return end
+
+    local blueprint_entities = blueprint.get_blueprint_entities()
+    if not blueprint_entities then return end
+
+    local area = event.area
+    local surface = player.surface
+    
+    -- debug log removed
+
+    for _, blueprint_entity in pairs(blueprint_entities) do
+        local tags = blueprint.get_blueprint_entity_tags(blueprint_entity.entity_number)
+        if tags and tags.void_storage_channel_mode and tags.void_storage_channel_name then
+            local target_pos = {
+                x = area.left_top.x + blueprint_entity.position.x,
+                y = area.left_top.y + blueprint_entity.position.y
+            }
+            
+            local cache_key = string.format("%s_%.6f_%.6f", surface.name, target_pos.x, target_pos.y)
+            storage.priyutils_void_storage.ghost_tags_cache[cache_key] = {
+                channel_mode = tags.void_storage_channel_mode,
+                channel_name = tags.void_storage_channel_name,
+                tick = game.tick
+            }
+            
+            -- removed debug log
+        end
+    end
+end
+
+local function on_entity_cloned(event)
+    local source = event.source
+    local destination = event.destination
+    if not (source and destination and source.valid and destination.valid) then return end
+
+    local source_type = get_entity_storage_type(source)
+    local dest_type = get_entity_storage_type(destination)
+    if not source_type or not dest_type or source_type ~= dest_type then return end
+
+    if not storage then storage = {} end
+    if not storage.priyutils_void_storage then init_storage() end
+
+    local source_data = nil
+    local entities = source_type == CHANNEL_TYPE.CONTAINER
+        and storage.priyutils_void_storage.containers
+        or storage.priyutils_void_storage.tanks
+
+    if entities[source.unit_number] then
+        source_data = entities[source.unit_number]
+    elseif source.tags and source.tags.void_storage_channel_mode and source.tags.void_storage_channel_name then
+        source_data = {
+            channel_mode = source.tags.void_storage_channel_mode,
+            channel_name = source.tags.void_storage_channel_name
+        }
+    end
+
+    if source_data then
+        if destination.type == "entity-ghost" then
+            destination.tags = {
+                void_storage_channel_mode = source_data.channel_mode,
+                void_storage_channel_name = source_data.channel_name
+            }
+            
+            local cache_key = string.format("%s_%.6f_%.6f", destination.surface.name, destination.position.x, destination.position.y)
+            storage.priyutils_void_storage.ghost_tags_cache[cache_key] = {
+                channel_mode = source_data.channel_mode,
+                channel_name = source_data.channel_name,
+                tick = game.tick
+            }
+            
+            -- removed debug log
+        else
+            remove_entity_from_channel(destination)
+            add_entity_to_channel(destination, source_data.channel_mode, source_data.channel_name)
+            -- removed debug log
+        end
+    end
+end
+
+function VoidStorage.on_init()
+    on_init()
+end
+
+function VoidStorage.on_load()
+    on_load()
+end
+
+function VoidStorage.on_configuration_changed(data)
+    on_configuration_changed(data)
+end
+
+function VoidStorage.register_with_event_system(Event)
+    -- removed debug log
+    local function on_built_entity_debug(event)
+        local entity = event.created_entity or event.entity
+        if entity and entity.valid then
+            -- removed debug log
+        else
+            -- removed debug log
+        end
+        on_entity_created(event)
+    end
+
+    Event.addListener(defines.events.on_built_entity, on_built_entity_debug)
+    -- message_panel.debug("VoidStorage: registered on_built_entity")
+    Event.addListener(defines.events.on_robot_built_entity, on_built_entity_debug)
+    -- message_panel.debug("VoidStorage: registered on_robot_built_entity")
+    Event.addListener(defines.events.on_space_platform_built_entity, on_entity_created)
+    -- message_panel.debug("VoidStorage: registered on_space_platform_built_entity")
+    Event.addListener(defines.events.script_raised_built, on_entity_created)
+    -- message_panel.debug("VoidStorage: registered script_raised_built")
+    Event.addListener(defines.events.script_raised_revive, on_entity_created)
+    -- message_panel.debug("VoidStorage: registered script_raised_revive")
+    Event.addListener(defines.events.on_entity_died, on_entity_removed)
+    Event.addListener(defines.events.on_player_mined_entity, on_entity_removed)
+    Event.addListener(defines.events.on_robot_mined_entity, on_entity_removed)
+    Event.addListener(defines.events.script_raised_destroy, on_entity_removed)
+    Event.addListener(defines.events.on_post_entity_died, on_post_entity_died)
+
+    Event.addListener(defines.events.on_gui_opened, on_gui_opened)
+    Event.addListener(defines.events.on_gui_closed, on_gui_closed)
+    Event.addListener(defines.events.on_gui_click, on_gui_click)
+    Event.addListener(defines.events.on_gui_selection_state_changed, on_gui_selection_state_changed)
+    Event.addListener(defines.events.on_gui_switch_state_changed, on_gui_switch_state_changed)
+
+    script.on_event(defines.events.on_tick, on_tick)
+
+    Event.addListener(defines.events.on_entity_settings_pasted, on_entity_settings_pasted)
+    Event.addListener(defines.events.on_player_setup_blueprint, on_player_setup_blueprint)
+    if defines.events.on_player_copied_area then
+        Event.addListener(defines.events.on_player_copied_area, on_player_setup_blueprint)
+    end
+    if defines.events.on_player_pasted_area then
+        Event.addListener(defines.events.on_player_pasted_area, on_player_pasted_area)
+    end
+    Event.addListener(defines.events.on_entity_cloned, on_entity_cloned)
+end
 
 return VoidStorage

@@ -141,13 +141,29 @@ end
 
 local snap_loader = {}
 
-snap_loader.events = {
-  [defines.events.on_built_entity] = on_entity_built,
-  [defines.events.on_entity_cloned] = on_entity_built,
-  [defines.events.on_robot_built_entity] = on_entity_built,
-  [defines.events.script_raised_built] = on_entity_built,
-  [defines.events.script_raised_revive] = on_entity_built,
-  [defines.events.on_space_platform_built_entity] = on_entity_built,
-}
+local event_handlers = {}
+
+function snap_loader.register_event(event_name, handler)
+    if not event_handlers[event_name] then
+        event_handlers[event_name] = {}
+    end
+    table.insert(event_handlers[event_name], handler)
+end
+
+snap_loader.register_event(defines.events.on_built_entity, on_entity_built)
+snap_loader.register_event(defines.events.on_entity_cloned, on_entity_built)
+snap_loader.register_event(defines.events.on_robot_built_entity, on_entity_built)
+snap_loader.register_event(defines.events.script_raised_built, on_entity_built)
+snap_loader.register_event(defines.events.script_raised_revive, on_entity_built)
+snap_loader.register_event(defines.events.on_space_platform_built_entity, on_entity_built)
+
+snap_loader.events = {}
+for event_name, handlers in pairs(event_handlers) do
+    snap_loader.events[event_name] = function(event)
+        for _, handler in ipairs(handlers) do
+            handler(event)
+        end
+    end
+end
 
 return snap_loader
