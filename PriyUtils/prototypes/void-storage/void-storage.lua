@@ -53,7 +53,7 @@ local void_container_entity = {
 local void_tank_entity = {
     type = "storage-tank",
     name = "priyutils-void-tank",
-    icon = "__base__/graphics/icons/storage-tank.png",
+    icon = "__PriyUtils__/graphics/icons/cartooncup.png",
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     minable = {mining_time = 1, result = "priyutils-void-tank"},
     max_health = 500,
@@ -68,20 +68,21 @@ local void_tank_entity = {
         volume = 25000,
         pipe_covers = pipecoverspictures(),
         pipe_connections = {
-            {direction = defines.direction.north, position = {-1, -1}},
-            {direction = defines.direction.east, position = {1, 1}},
-            {direction = defines.direction.south, position = {1, 1}},
-            {direction = defines.direction.west, position = {-1, -1}}
+            {direction = defines.direction.east, position = {1, 0}},
+            {direction = defines.direction.west, position = {-1, 0}},
+            {direction = defines.direction.north, position = {0, -1}},
+            {direction = defines.direction.south, position = {0, 1}},
         },
         hide_connection_info = true
     },
     two_direction_only = true,
-    window_bounding_box = {{-0.125, 0.6875}, {0.1875, 1.1875}},
+    -- window_bounding_box = {{-0.125, 0.6875}, {0.1875, 1.1875}},
+    window_bounding_box = {{-0.2, -1.1}, {0.3, 0.3}},
     pictures = {
         picture = {
             sheets = {
                 {
-                    filename = "__base__/graphics/entity/storage-tank/storage-tank.png",
+                    filename = "__PriyUtils__/graphics/entity/storage-tank/cartooncup.png",
                     priority = "extra-high",
                     frames = 2,
                     width = 219,
@@ -108,10 +109,10 @@ local void_tank_entity = {
             height = 15
         },
         window_background = {
-            filename = "__base__/graphics/entity/storage-tank/window-background.png",
+            filename = "__PriyUtils__/graphics/entity/storage-tank/cartooncup-window-background.png",
             priority = "extra-high",
-            width = 34,
-            height = 48,
+            width = 53,
+            height = 38,
             scale = 0.5
         },
         flow_sprite = {
