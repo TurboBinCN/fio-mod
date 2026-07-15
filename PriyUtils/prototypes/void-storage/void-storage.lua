@@ -140,7 +140,9 @@ local void_tank_entity = {
         sound = {filename = "__base__/sound/storage-tank.ogg", volume = 0.6, audible_distance_modifier = 0.5},
         match_volume_to_activity = true,
         max_sounds_per_prototype = 3
-    }
+    },
+    circuit_connector = circuit_connector_definitions["storage-tank"],
+    circuit_wire_max_distance = default_circuit_wire_max_distance
 }
 
 data:extend({

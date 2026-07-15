@@ -127,7 +127,7 @@ end
 
 local function on_entity_built(e)
   local entity = e.entity or e.destination
-  if not entity.valid or not string.match(entity.name, "^priy%-.*%-loader$") then
+  if not entity.valid or not string.match(entity.name, "^priy%.*%-loader$") then
     return
   end
 
