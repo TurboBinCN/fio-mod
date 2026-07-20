@@ -77,7 +77,7 @@ local void_tank_entity = {
     },
     two_direction_only = true,
     -- window_bounding_box = {{-0.125, 0.6875}, {0.1875, 1.1875}},
-    window_bounding_box = {{-0.2, -1.1}, {0.3, 0.3}},
+    window_bounding_box = {{-0.2, -0.5}, {0.3, 0.3}},
     pictures = {
         picture = {
             sheets = {

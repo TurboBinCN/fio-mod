@@ -15,6 +15,9 @@ if mods["space-exploration"] then
   if data.raw.furnace["priyutils-void-tank"] then
     data.raw.furnace["priyutils-void-tank"].se_allow_in_space = true
   end
+  if data.raw["logistic-container"]["turret-interface"] then
+    data.raw["logistic-container"]["turret-interface"].se_allow_in_space = true
+  end
 end
 if not mods["Krastorio2"] then
   require("prototypes.buildings.logistic-upgrade")
