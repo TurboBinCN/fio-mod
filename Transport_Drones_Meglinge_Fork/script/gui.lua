@@ -1367,30 +1367,64 @@ local focus_on_network_node = function(player, network_id)
   
 end
 
-local player_network_overlays = {}
-local player_network_overlay_enabled = {}
-local player_network_overlay_version = {}
-local network_version = 0
+if not storage.player_network_overlays then
+  storage.player_network_overlays = {}
+end 
+
+if not storage.player_network_overlay_enabled then
+  storage.player_network_overlay_enabled = {}
+end
+
+-- 将版本变量移到 storage 中以持久化
+if not storage.network_overlay_version then
+  storage.network_overlay_version = 0
+end
+
+if not storage.player_network_overlay_version then
+  storage.player_network_overlay_version = {}
+end
+
+local network_version = storage.network_overlay_version
+local player_network_overlay_version = storage.player_network_overlay_version
+
+-- ========== Network Overlay State Persistence ==========
+-- Key design: rendering objects are destroyed on save/load, but storage persists.
+-- The enabled state + version tracking ensures overlays are automatically recreated.
+-- 
+-- Storage variables (persist across save/load):
+--   - player_network_overlay_enabled[player]: true/false - whether overlay should be shown
+--   - network_overlay_version: global counter incremented when networks change
+--   - player_network_overlay_version[player]: version when overlay was last created
+--
+-- Runtime variables (lost on save/load):
+--   - player_network_overlays[player]: array of rendering objects (must be recreated)
 
 local increment_network_version = function()
   network_version = network_version + 1
+  storage.network_overlay_version = network_version
 end
 
 local hide_network_overlay = function(player)
-  if player_network_overlays[player.index] then
-    for _, obj in pairs(player_network_overlays[player.index]) do
-      if obj.valid then
-        obj.destroy()
-      end
-    end
-    player_network_overlays[player.index] = nil
+  if not storage.player_network_overlays[player.index] then
+    return
   end
+  
+  for _, obj in pairs(storage.player_network_overlays[player.index]) do
+    if obj and obj.valid then
+      obj.destroy()
+    end
+  end
+  storage.player_network_overlays[player.index] = nil
 end
 
 local show_network_overlay = function(player)
-  if player_network_overlays[player.index] then
+  -- Early return if overlay already exists
+  if storage.player_network_overlays[player.index] then
     return
   end
+  
+  -- Ensure enabled state is true
+  storage.player_network_overlay_enabled[player.index] = true
   
   local networks = road_network.get_networks()
   local node_map = road_network.get_node_map()
@@ -1425,30 +1459,46 @@ local show_network_overlay = function(player)
     end
   end
   
-  player_network_overlays[player.index] = overlay_objs
-  player_network_overlay_version[player.index] = network_version
+  storage.player_network_overlays[player.index] = overlay_objs
+  storage.player_network_overlay_version[player.index] = network_version
 end
 
 local update_network_overlay_for_player = function(player)
+  -- Ensure storage tables exist (safety check)
+  if not storage.player_network_overlays then
+    storage.player_network_overlays = {}
+  end
+  if not storage.player_network_overlay_enabled then
+    storage.player_network_overlay_enabled = {}
+  end
+  if not storage.player_network_overlay_version then
+    storage.player_network_overlay_version = {}
+  end
+  
   local is_in_remote_view = player.controller_type == defines.controllers.remote
-  local has_overlay = player_network_overlays[player.index] ~= nil
-  local enabled = player_network_overlay_enabled[player.index]
-  local current_version = player_network_overlay_version[player.index]
+  local has_overlay = storage.player_network_overlays[player.index] ~= nil
+  local enabled = storage.player_network_overlay_enabled[player.index]
+  local current_version = storage.player_network_overlay_version[player.index]
   
   if is_in_remote_view then
+    -- Default to enabled for remote view players
     if enabled == nil then
-      player_network_overlay_enabled[player.index] = true
+      storage.player_network_overlay_enabled[player.index] = true
       enabled = true
     end
+    
     if enabled then
       if not has_overlay then
+        -- Overlay missing (e.g., after save/load), recreate it
         show_network_overlay(player)
       elseif current_version ~= network_version then
+        -- Network changed, refresh overlay to match current state
         hide_network_overlay(player)
         show_network_overlay(player)
       end
     end
   elseif has_overlay then
+    -- Player left remote view, hide overlay
     hide_network_overlay(player)
   end
 end
@@ -1459,12 +1509,12 @@ local toggle_network_overlay = function(player)
     return
   end
   
-  if player_network_overlays[player.index] then
+  if storage.player_network_overlays[player.index] then
     hide_network_overlay(player)
-    player_network_overlay_enabled[player.index] = false
+    storage.player_network_overlay_enabled[player.index] = false
     player.print({"gui.network-overlay-hidden"})
   else
-    player_network_overlay_enabled[player.index] = true
+    storage.player_network_overlay_enabled[player.index] = true
     show_network_overlay(player)
     player.print({"gui.network-overlay-shown"})
   end
@@ -1678,10 +1728,11 @@ local on_player_joined_game = function(event)
   update_overhead_button(event.player_index)
   
   local player = game.get_player(event.player_index)
-  if player then
-    rendering.clear("Transport_Drones_Meglinge_Fork")
-    player_network_overlays[player.index] = nil
-    player_network_overlay_enabled[player.index] = player.controller_type == defines.controllers.remote
+  if not player then return end
+  
+  -- Initialize enabled state: default to true for remote view players
+  if storage.player_network_overlay_enabled[player.index] == nil then
+    storage.player_network_overlay_enabled[player.index] = player.controller_type == defines.controllers.remote
   end
 end
 
